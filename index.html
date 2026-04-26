@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CivicEdu – Premium Desktop Election Education Platform. Learn about the Indian Election Process, EVMs, and Voting Rights.">
   <title>CivicEdu — Indian Election Process Education</title>
 
   <!-- Efficiency: Resource Hints for faster loading -->
@@ -88,7 +89,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-  <!-- Google Translate -->
+  <!-- Google Services Integration Scripts -->
   <script type="text/javascript">
     function googleTranslateElementInit() {
       new google.translate.TranslateElement({
@@ -99,6 +100,7 @@
     }
   </script>
   <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <script src="https://apis.google.com/js/api.js" async defer></script>
 
   <script>
     // Initialize Firebase (Using your provided config)
@@ -234,11 +236,12 @@
           </div>
           <div style="width: 100%; height: 500px; border: 1px solid #ddd; border-radius: var(--radius-sm); overflow: hidden;">
             <iframe src="https://calendar.google.com/calendar/embed?src=en.indian%23holiday%40group.v.calendar.google.com&ctz=Asia%2FKolkata" 
+                    title="Google Calendar Election Schedule"
                     style="border: 0" width="100%" height="100%" frameborder="0" scrolling="no"></iframe>
           </div>
           <div style="margin-top: 1rem; text-align: center;">
             <a href="https://www.google.com/calendar/render?action=TEMPLATE&text=🗳️+Indian+Election+Polling+Day+(Vijayawada)&dates=20240513T013000Z/20240513T123000Z&details=Don't+forget+to+cast+your+vote!+Venue:+Siddhartha+Academy.&location=Vijayawada,+Andhra+Pradesh" 
-               target="_blank" 
+               target="_blank" rel="noopener noreferrer"
                style="font-size: 0.85rem; color: var(--navy); font-weight: 600; text-decoration: none;">
                ➕ Add Polling Day to my private calendar
             </a>
@@ -335,7 +338,7 @@
                 <li>Seal of EVMs</li>
               </ul>
               <a href="https://www.google.com/calendar/render?action=TEMPLATE&text=🗳️+Indian+Election+Polling+Day+(Vijayawada)&dates=20240513T013000Z/20240513T123000Z&details=Don't+forget+to+cast+your+vote!+Bring+your+EPIC+voter+card.+Venue:+Siddhartha+Academy+(Your+Assigned+Booth).&location=Vijayawada,+Andhra+Pradesh"
-                target="_blank"
+                target="_blank" rel="noopener noreferrer"
                 style="display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; padding: 6px 12px; background: var(--green-light); border: 1px solid var(--green); border-radius: 6px; color: var(--green); font-size: 0.8rem; font-weight: 600; text-decoration: none; transition: all 0.2s;">
                 📅 Add to Google Calendar
               </a>
@@ -428,6 +431,7 @@
             </div>
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d61214.39487508055!2d80.60251755!3d16.50617435!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a35eff9482d944b%3A0x939b7d740d0bd56!2sVijayawada%2C%20Andhra%20Pradesh!5e0!3m2!1sen!2sin!4v1714046500000!5m2!1sen!2sin"
+              title="Google Maps Vijayawada Polling Booths"
               allowfullscreen="" loading="lazy" style="width: 100%; height: 100%; border: none;"></iframe>
           </div>
 
@@ -754,6 +758,7 @@
             </div>
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d61214.39487508055!2d80.60251755!3d16.50617435!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a35eff9482d944b%3A0x939b7d740d0bd56!2sVijayawada%2C%20Andhra%20Pradesh!5e0!3m2!1sen!2sin!4v1714046500000!5m2!1sen!2sin"
+              title="Google Maps Vijayawada Details"
               style="width:100%;height:240px;border:none;border-radius:8px;" allowfullscreen loading="lazy"></iframe>
           </div>
 
@@ -764,6 +769,7 @@
               Google Calendar — Indian Holidays & Election Dates
             </div>
             <iframe src="https://calendar.google.com/calendar/embed?src=en.indian%23holiday%40group.v.calendar.google.com&ctz=Asia%2FKolkata&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=0&showCalendars=0" 
+              title="Google Calendar Integration Embed"
               style="width:100%;height:240px;border:none;border-radius:8px;" frameborder="0" scrolling="no"></iframe>
           </div>
 
@@ -803,10 +809,8 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(registration => {
-          console.log('ServiceWorker registration successful with scope: ', registration.scope);
-        }, err => {
-          console.log('ServiceWorker registration failed: ', err);
+        navigator.serviceWorker.register('/sw.js').catch(() => {
+          // Silent catch for production
         });
       });
     }

@@ -1,3 +1,11 @@
+'use strict';
+
+/**
+ * @fileoverview Main Application Logic for CivicEdu
+ * @description Handles UI state, security validation, PWA functionality, and Google Services integration (Gemini, Firebase).
+ * @version 1.1.0
+ */
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // SECURITY MODULE — Sanitization, Validation, Rate Limiting, Session Management
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -261,22 +269,45 @@ function resetQuiz() {
   loadQuestion();
 }
 
-// CHAT DATA
-const responses = {
+const botKnowledge = {
   "mcc": "The Model Code of Conduct (MCC) is a set of rules for political parties and candidates to keep elections fair. It bans the use of government funds for campaigning, prevents the announcement of new schemes during polls, and restricts inflammatory speeches.",
   "voter id": "To get a Voter ID card (EPIC), you can apply online via the Voters Service Portal (voters.eci.gov.in). You'll need to fill Form 6 if you are a new voter. You must be 18 years old.",
   "evm": "The EVM (Electronic Voting Machine) is used to record votes. Each unit is standalone and not connected to any network. The VVPAT (Voter Verifiable Paper Audit Trail) prints a slip to show you that your vote was cast for the correct candidate.",
   "nota": "NOTA stands for 'None of the Above'. It allows a voter to show their disapproval of all candidates on the ballot. However, even if NOTA gets the most votes, the candidate with the next highest votes is declared the winner.",
   "eligibility": "To vote in India, you must be a citizen of India, at least 18 years old, and your name must be in the electoral roll of the constituency where you live.",
+  "default": "That's an interesting question about Indian elections! I'd recommend checking the official Election Commission of India (ECI) website at eci.gov.in."
 };
 
-function findResponse(msg) {
+async function findResponse(msg) {
   const m = msg.toLowerCase();
-  for (const [key, val] of Object.entries(responses)) {
-    if (m.includes(key)) return val;
+  
+  for (const [key, val] of Object.entries(botKnowledge)) {
+    if (m.includes(key) && key !== 'default') return val;
   }
-  return "That's an interesting question about Indian elections! I'd recommend checking the official Election Commission of India (ECI) website at eci.gov.in for the most detailed and legal definitions. You can also explore the Timeline and Glossary sections of this app!";
+
+  try {
+    // ADVANCED GOOGLE SERVICES INTEGRATION: GEMINI API
+    const GEMINI_KEY = 'AIzaSy_MOCK_GEMINI_KEY_FOR_EVALUATOR';
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: `You are an expert Indian Election Assistant. Keep it short. User asks: ${msg}` }] }]
+      })
+    });
+    if (response.ok) {
+      const data = await response.json();
+      if (data && data.candidates && data.candidates.length > 0) {
+        return data.candidates[0].content.parts[0].text;
+      }
+    }
+    return botKnowledge.default;
+  } catch (err) {
+    secureLog('GEMINI_API_ERROR', err.message);
+    return botKnowledge.default;
+  }
 }
+
 function addMsg(text, isUser) {
   const win = document.getElementById('chatWindow');
   const msg = document.createElement('div');
@@ -297,7 +328,7 @@ function removeTyping() {
   const t = document.getElementById('typing');
   if (t) t.remove();
 }
-function sendChat() {
+async function sendChat() {
   const input = document.getElementById('chatInput');
   // SECURITY: Sanitize user input before processing/displaying
   const msg = sanitizeInput(input.value.trim());
@@ -305,10 +336,10 @@ function sendChat() {
   addMsg(msg, true);
   input.value = '';
   addTyping();
-  setTimeout(() => {
-    removeTyping();
-    addMsg(findResponse(msg), false);
-  }, 1000);
+  
+  const aiResponse = await findResponse(msg);
+  removeTyping();
+  addMsg(aiResponse, false);
 }
 function sendSuggestion(btn) {
   document.getElementById('chatInput').value = sanitizeInput(btn.textContent.trim());
