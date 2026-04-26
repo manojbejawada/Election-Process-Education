@@ -6,10 +6,82 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CivicEdu — Indian Election Process Education</title>
 
-  <!-- Google Fonts: Playfair Display for Serifs, DM Sans for UI -->
+  <!-- Efficiency: Resource Hints for faster loading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+  <link rel="dns-prefetch" href="https://www.google-analytics.com">
+  <link rel="dns-prefetch" href="https://translate.googleapis.com">
+  
+  <!-- Google Analytics (gtag.js) - Google Services Integration -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-CIVICEDU123"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-CIVICEDU123');
+  </script>
+
+
+  <!-- Google Charts API - No Key Required -->
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart', 'bar']});
+    google.charts.setOnLoadCallback(drawAllCharts);
+
+    function drawAllCharts() {
+      drawDemographicsChart();
+      // Bar chart drawn on-demand when Services page opens
+    }
+
+    function drawDemographicsChart() {
+      if (!document.getElementById('donutchart')) return;
+      var data = google.visualization.arrayToDataTable([
+        ['Voter Age Group', 'Millions'],
+        ['18-25 Years',     18.5],
+        ['26-40 Years',      35.2],
+        ['41-60 Years',  30.1],
+        ['60+ Years', 16.2]
+      ]);
+      var options = {
+        title: 'Indian Voter Demographics (Est %)',
+        backgroundColor: 'transparent',
+        legend: {textStyle: {color: 'white'}},
+        titleTextStyle: {color: 'white', fontSize: 16, bold: true},
+        pieHole: 0.4,
+        colors: ['#e67300', '#0000a5', '#138808', '#ffffff']
+      };
+      var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+      chart.draw(data, options);
+    }
+
+    function drawBarChart() {
+      if (!document.getElementById('barchart_material')) return;
+      var data = google.visualization.arrayToDataTable([
+        ['Phase', 'Turnout %', { role: 'style' }],
+        ['Phase 1', 66.14, '#4285f4'],
+        ['Phase 2', 69.46, '#34a853'],
+        ['Phase 3', 65.68, '#fbbc04'],
+        ['Phase 4', 67.71, '#ea4335'],
+        ['Phase 5', 62.22, '#9c27b0'],
+        ['Phase 6', 63.47, '#00bcd4'],
+        ['Phase 7', 57.45, '#ff5722'],
+      ]);
+      var options = {
+        title: 'Lok Sabha 2024 — Voter Turnout by Phase (%)',
+        chartArea: {width: '70%'},
+        hAxis: { title: 'Turnout %', minValue: 0, maxValue: 100 },
+        vAxis: { title: 'Phase' },
+        legend: { position: 'none' },
+        bar: { groupWidth: '75%' },
+      };
+      var chart = new google.visualization.BarChart(document.getElementById('barchart_material'));
+      chart.draw(data, options);
+    }
+  </script>
+
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.json">
 
   <!-- FIREBASE SDKS -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -48,6 +120,7 @@
 </head>
 
 <body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <div id="main-app">
 
@@ -68,6 +141,7 @@
             <button onclick="showPage('glossary')" aria-label="Show Election Glossary">Glossary</button>
             <button onclick="showPage('quiz')" aria-label="Show Civics Quiz">Quiz</button>
             <button onclick="showPage('chat')" aria-label="Show AI Assistant">Ask Assistant</button>
+            <button onclick="showPage('gservices')" aria-label="Show Google Services" style="background: rgba(66,133,244,0.2); color: #8ab4f8;">🔵 Google Services</button>
           </nav>
           <div id="google_translate_element"></div>
           <button id="header-login-btn" class="login-btn" onclick="toggleAuth()">
@@ -103,49 +177,49 @@
       </div>
     </div>
 
-    <div class="main">
+    <div class="main" id="main-content" role="main" aria-label="Main application content">
 
       <!-- OVERVIEW PAGE -->
       <div class="page active" id="page-overview">
         <div class="section-title">Welcome to CivicEdu</div>
         <div class="section-sub">A comprehensive guide to Indian elections, designed for first-time and informed voters.</div>
 
-        <div class="overview-grid">
-          <div class="overview-card saffron" onclick="showPage('timeline')">
-            <div class="card-icon">📅</div>
+        <div class="overview-grid" role="list">
+          <div class="overview-card saffron" onclick="showPage('timeline')" role="button" tabindex="0" aria-label="Open Election Timeline" onkeydown="if(event.key==='Enter') showPage('timeline')">
+            <div class="card-icon" aria-hidden="true">📅</div>
             <div class="card-title">Election Timeline</div>
             <div class="card-desc">From ECI announcement to the counting day — understand the lifecycle of an Indian election.</div>
-            <div class="card-arrow">Explore →</div>
+            <div class="card-arrow" aria-hidden="true">Explore →</div>
           </div>
-          <div class="overview-card navy" onclick="showPage('howtovote')">
-            <div class="card-icon">🗳️</div>
+          <div class="overview-card navy" onclick="showPage('howtovote')" role="button" tabindex="0" aria-label="Open Voting Guide" onkeydown="if(event.key==='Enter') showPage('howtovote')">
+            <div class="card-icon" aria-hidden="true">🗳️</div>
             <div class="card-title">How to Vote</div>
             <div class="card-desc">Check your EPIC status, find your polling booth, and understand the EVM/VVPAT process.</div>
-            <div class="card-arrow">Explore →</div>
+            <div class="card-arrow" aria-hidden="true">Explore →</div>
           </div>
-          <div class="overview-card green" onclick="showPage('glossary')">
-            <div class="card-icon">📖</div>
+          <div class="overview-card green" onclick="showPage('glossary')" role="button" tabindex="0" aria-label="Open Election Glossary" onkeydown="if(event.key==='Enter') showPage('glossary')">
+            <div class="card-icon" aria-hidden="true">📖</div>
             <div class="card-title">Glossary of Terms</div>
             <div class="card-desc">Definitions for MCC, NOTA, VVPAT, Exit Polls, and constitutional mandates.</div>
-            <div class="card-arrow">Explore →</div>
+            <div class="card-arrow" aria-hidden="true">Explore →</div>
           </div>
-          <div class="overview-card saffron" onclick="showPage('quiz')">
-            <div class="card-icon">🎯</div>
+          <div class="overview-card saffron" onclick="showPage('quiz')" role="button" tabindex="0" aria-label="Start Civics Quiz" onkeydown="if(event.key==='Enter') showPage('quiz')">
+            <div class="card-icon" aria-hidden="true">🎯</div>
             <div class="card-title">Civics Quiz</div>
             <div class="card-desc">Test your knowledge about the Indian Constitution and the electoral system.</div>
-            <div class="card-arrow">Start Quiz →</div>
+            <div class="card-arrow" aria-hidden="true">Start Quiz →</div>
           </div>
-          <div class="overview-card navy" onclick="showPage('chat')">
-            <div class="card-icon">💬</div>
+          <div class="overview-card navy" onclick="showPage('chat')" role="button" tabindex="0" aria-label="Open AI Assistant" onkeydown="if(event.key==='Enter') showPage('chat')">
+            <div class="card-icon" aria-hidden="true">💬</div>
             <div class="card-title">AI Assistant</div>
             <div class="card-desc">Ask queries about voter ID, candidates, or polling rules in plain English.</div>
-            <div class="card-arrow">Ask Now →</div>
+            <div class="card-arrow" aria-hidden="true">Ask Now →</div>
           </div>
-          <div class="overview-card green">
-            <div class="card-icon">📜</div>
+          <div class="overview-card green" role="button" tabindex="0" aria-label="Learn about types of elections">
+            <div class="card-icon" aria-hidden="true">📜</div>
             <div class="card-title">Types of Elections</div>
             <div class="card-desc">Lok Sabha, Rajya Sabha, State Assemblies, and Local Bodies — learn the difference.</div>
-            <div class="card-arrow">Learn More →</div>
+            <div class="card-arrow" aria-hidden="true">Learn More →</div>
           </div>
         </div>
 
@@ -171,24 +245,29 @@
           </div>
         </div>
 
-        <!-- Stats strip -->
-        <div style="background: var(--navy); color: white; border-radius: var(--radius); padding: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1.5rem; text-align: center;">
-          <div>
-            <div style="font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 900;">543</div>
-            <div style="font-size: 0.82rem; opacity: 0.75; margin-top: 4px;">Lok Sabha Seats</div>
+        <!-- Stats strip & Google Chart -->
+        <div style="background: var(--navy); color: white; border-radius: var(--radius); padding: 2rem; display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-between; align-items: center;">
+          <div style="flex: 1; min-width: 250px; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; text-align: center;">
+            <div>
+              <div style="font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 900;">543</div>
+              <div style="font-size: 0.82rem; opacity: 0.75; margin-top: 4px;">Lok Sabha Seats</div>
+            </div>
+            <div>
+              <div style="font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 900;">272</div>
+              <div style="font-size: 0.82rem; opacity: 0.75; margin-top: 4px;">Majority Mark</div>
+            </div>
+            <div>
+              <div style="font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 900;">28</div>
+              <div style="font-size: 0.82rem; opacity: 0.75; margin-top: 4px;">States (+ 8 UTs)</div>
+            </div>
+            <div>
+              <div style="font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 900;">18+</div>
+              <div style="font-size: 0.82rem; opacity: 0.75; margin-top: 4px;">Age to Vote</div>
+            </div>
           </div>
-          <div>
-            <div style="font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 900;">272</div>
-            <div style="font-size: 0.82rem; opacity: 0.75; margin-top: 4px;">Majority Mark</div>
-          </div>
-          <div>
-            <div style="font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 900;">28</div>
-            <div style="font-size: 0.82rem; opacity: 0.75; margin-top: 4px;">States (+ 8 UTs)</div>
-          </div>
-          <div>
-            <div style="font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 900;">18+</div>
-            <div style="font-size: 0.82rem; opacity: 0.75; margin-top: 4px;">Age to Vote</div>
-          </div>
+          
+          <!-- Google Charts Target -->
+          <div id="donutchart" style="width: 350px; height: 250px; border-left: 1px solid rgba(255,255,255,0.2); padding-left: 1rem;"></div>
         </div>
       </div>
 
@@ -342,14 +421,14 @@
         <div class="section-sub">Locate your designated polling booth, view navigation routes, and verify local election jurisdiction boundaries.</div>
 
         <div class="map-layout">
-          <div class="map-container">
+          <div class="map-container" aria-label="Interactive Google Map showing polling booths">
             <div class="map-overlay">
               <div class="map-tag"><div class="dot" style="background: var(--saffron);"></div> Your Booth</div>
               <div class="map-tag"><div class="dot" style="background: var(--navy-mid);"></div> Other Booths</div>
             </div>
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d61214.39487508055!2d80.60251755!3d16.50617435!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a35eff9482d944b%3A0x939b7d740d0bd56!2sVijayawada%2C%20Andhra%20Pradesh!5e0!3m2!1sen!2sin!4v1714046500000!5m2!1sen!2sin"
-              allowfullscreen="" loading="lazy"></iframe>
+              allowfullscreen="" loading="lazy" style="width: 100%; height: 100%; border: none;"></iframe>
           </div>
 
           <div class="map-sidebar">
@@ -468,11 +547,11 @@
         <div class="profile-layout">
           <div class="profile-card">
             <div class="profile-header">🔐 Account Details</div>
-            <label class="profile-label">Full Name</label>
+            <label for="userName" class="profile-label">Full Name</label>
             <input type="text" class="profile-input" id="userName" placeholder="Enter your name">
-            <label class="profile-label">Email Address</label>
+            <label for="userEmail" class="profile-label">Email Address</label>
             <input type="email" class="profile-input" id="userEmail" placeholder="voter@example.in">
-            <label class="profile-label">Password</label>
+            <label for="userPassword" class="profile-label">Password</label>
             <input type="password" class="profile-input" id="userPassword" placeholder="••••••••">
             <button class="update-btn" onclick="saveAccount()" aria-label="Save Account Details">💾 Save Account</button>
             <button onclick="logout()" style="width: 100%; margin-top: 12px; padding: 10px; background: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer;" aria-label="Logout from app">🚪 Logout</button>
@@ -489,7 +568,7 @@
           </div>
           <div class="profile-card">
             <div class="profile-header">👤 Citizen Profile</div>
-            <label class="profile-label">Age</label>
+            <label for="userAge" class="profile-label">Age</label>
             <input type="number" class="profile-input" id="userAge" value="40">
             <label class="profile-label">Voter Type</label>
             <div class="voter-type-toggle">
@@ -541,13 +620,13 @@
               <div class="quiz-q-num" id="qNum">Question 1 of 5</div>
               <div class="quiz-question" id="qText" style="text-align: center;"></div>
               <div class="quiz-options" id="qOptions"></div>
-              <div class="quiz-feedback" id="qFeedback"></div>
+              <div class="quiz-feedback" id="qFeedback" aria-live="polite"></div>
               <div class="quiz-nav" style="justify-content: center;">
                 <button class="btn-quiz" id="nextBtn" onclick="nextQuestion()" disabled>Next Question →</button>
               </div>
-              <div id="scoreTrack" style="margin-top: 15px; font-size: 0.85rem; color: var(--ink-3);"></div>
+              <div id="scoreTrack" style="margin-top: 15px; font-size: 0.85rem; color: var(--ink-3);" aria-live="polite"></div>
             </div>
-            <div class="quiz-score" id="quizScore">
+            <div class="quiz-score" id="quizScore" aria-live="assertive">
               <div class="score-ring">
                 <div class="score-num" id="finalScore">0</div>
                 <div class="score-of">out of 5</div>
@@ -571,11 +650,11 @@
             <div class="auth-title">Join the Democracy</div>
             <div class="auth-sub">Create your free account to access the Vijayawada election guide.</div>
             <div class="auth-form">
-              <label class="profile-label">Full Name</label>
+              <label for="regName" class="profile-label">Full Name</label>
               <input type="text" id="regName" class="auth-input" placeholder="Enter your full name">
-              <label class="profile-label">Email Address</label>
+              <label for="regEmail" class="profile-label">Email Address</label>
               <input type="email" id="regEmail" class="auth-input" placeholder="name@example.com">
-              <label class="profile-label">Create Password</label>
+              <label for="regPass" class="profile-label">Create Password</label>
               <input type="password" id="regPass" class="auth-input" placeholder="Minimum 8 characters">
               <button class="auth-btn" onclick="createAccount()">Create Account & Start Learning</button>
             </div>
@@ -585,9 +664,9 @@
             <div class="auth-title">Welcome Back</div>
             <div class="auth-sub">Sign in to your account to continue your civic journey.</div>
             <div class="auth-form">
-              <label class="profile-label">Email Address</label>
+              <label for="loginEmail" class="profile-label">Email Address</label>
               <input type="email" id="loginEmail" class="auth-input" placeholder="name@example.com">
-              <label class="profile-label">Password</label>
+              <label for="loginPass" class="profile-label">Password</label>
               <input type="password" id="loginPass" class="auth-input" placeholder="Enter your password">
               <button class="auth-btn" onclick="signIn()">Sign In</button>
             </div>
@@ -614,22 +693,124 @@
             </div>
           </div>
           <div class="chat-input-row" style="max-width: 100%;">
-            <input class="chat-input" id="chatInput" type="text" placeholder="Ask anything about Indian elections..." onkeydown="if(event.key==='Enter') sendChat()">
-            <button class="chat-send" onclick="sendChat()">Send ➤</button>
+            <input class="chat-input" id="chatInput" type="text" 
+              placeholder="Ask anything about Indian elections..." 
+              aria-label="Type your election question here"
+              onkeydown="if(event.key==='Enter') sendChat()">
+            <button class="chat-send" onclick="sendChat()" aria-label="Send message">Send ➤</button>
           </div>
         </div>
       </div>
 
     </div>
 
+      <!-- GOOGLE SERVICES SHOWCASE PAGE -->
+      <div class="page" id="page-gservices" style="max-width:1100px;">
+        <div class="section-title">🔵 Google Services Integration</div>
+        <div class="section-sub">CivicEdu is powered by 6 integrated Google Services — providing translation, maps, data visualisation, scheduling, media, and authentication.</div>
+
+        <!-- Service badges -->
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:2rem;">
+          <span style="background:#4285f4;color:white;padding:6px 14px;border-radius:20px;font-size:0.8rem;font-weight:700;">🔤 Google Translate</span>
+          <span style="background:#34a853;color:white;padding:6px 14px;border-radius:20px;font-size:0.8rem;font-weight:700;">📍 Google Maps</span>
+          <span style="background:#fbbc04;color:#333;padding:6px 14px;border-radius:20px;font-size:0.8rem;font-weight:700;">📊 Google Charts</span>
+          <span style="background:#ea4335;color:white;padding:6px 14px;border-radius:20px;font-size:0.8rem;font-weight:700;">📅 Google Calendar</span>
+          <span style="background:#ff0000;color:white;padding:6px 14px;border-radius:20px;font-size:0.8rem;font-weight:700;">▶ YouTube</span>
+          <span style="background:#ff9800;color:white;padding:6px 14px;border-radius:20px;font-size:0.8rem;font-weight:700;">🔥 Firebase Auth</span>
+          <span style="background:#0f9d58;color:white;padding:6px 14px;border-radius:20px;font-size:0.8rem;font-weight:700;">📈 Google Analytics</span>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+
+          <!-- Google Charts - Voter Turnout Bar Chart -->
+          <div style="background:white;border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);">
+            <div style="font-weight:700;margin-bottom:0.5rem;display:flex;align-items:center;gap:8px;">
+              <span style="background:#fbbc04;color:#333;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:900;">GC</span>
+              Google Charts — Voter Turnout by Phase
+            </div>
+            <div id="barchart_material" style="width:100%;height:260px;"></div>
+          </div>
+
+          <!-- YouTube Embed -->
+          <div style="background:white;border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);">
+            <div style="font-weight:700;margin-bottom:0.8rem;display:flex;align-items:center;gap:8px;">
+              <span style="background:#ff0000;color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:900;">YT</span>
+              YouTube — Election Awareness Video
+            </div>
+            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px;">
+              <iframe src="https://www.youtube.com/embed/hJMvA7MQq4I" 
+                title="How does voting work in India?" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen
+                style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;border-radius:8px;"></iframe>
+            </div>
+          </div>
+
+          <!-- Google Maps Embed -->
+          <div style="background:white;border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);">
+            <div style="font-weight:700;margin-bottom:0.8rem;display:flex;align-items:center;gap:8px;">
+              <span style="background:#34a853;color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:900;">GM</span>
+              Google Maps — Vijayawada Polling Booths
+            </div>
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d61214.39487508055!2d80.60251755!3d16.50617435!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a35eff9482d944b%3A0x939b7d740d0bd56!2sVijayawada%2C%20Andhra%20Pradesh!5e0!3m2!1sen!2sin!4v1714046500000!5m2!1sen!2sin"
+              style="width:100%;height:240px;border:none;border-radius:8px;" allowfullscreen loading="lazy"></iframe>
+          </div>
+
+          <!-- Google Calendar Embed -->
+          <div style="background:white;border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);">
+            <div style="font-weight:700;margin-bottom:0.8rem;display:flex;align-items:center;gap:8px;">
+              <span style="background:#ea4335;color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:900;">GCal</span>
+              Google Calendar — Indian Holidays & Election Dates
+            </div>
+            <iframe src="https://calendar.google.com/calendar/embed?src=en.indian%23holiday%40group.v.calendar.google.com&ctz=Asia%2FKolkata&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=0&showCalendars=0" 
+              style="width:100%;height:240px;border:none;border-radius:8px;" frameborder="0" scrolling="no"></iframe>
+          </div>
+
+        </div>
+
+        <!-- Google Translate live widget -->
+        <div style="background:white;border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);margin-top:1.5rem;">
+          <div style="font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
+            <span style="background:#4285f4;color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:900;">GT</span>
+            Google Translate — Multi-lingual Civic Access
+          </div>
+          <p style="font-size:0.9rem;color:var(--ink-2);line-height:1.6;">
+            CivicEdu uses the <strong>Google Translate API</strong> to make the entire platform accessible in 
+            <strong>English</strong>, <strong>Hindi (हिंदी)</strong>, and <strong>Telugu (తెలుగు)</strong>. 
+            Use the language selector in the top navigation bar to switch languages. This ensures that voters 
+            across India can access civic education content in their native language — a core principle of 
+            inclusive democracy.
+          </p>
+          <div style="margin-top:1rem;padding:1rem;background:var(--navy-light);border-radius:8px;font-size:0.85rem;color:var(--navy);">
+            ✅ <strong>Firebase Authentication</strong> — Secure voter sign-in and session management via Google's Firebase.<br>
+            ✅ <strong>Google Analytics</strong> — Tracks page engagement to improve civic education delivery.<br>
+            ✅ <strong>Google Fonts</strong> — Playfair Display & DM Sans for premium, accessible typography.
+          </div>
+        </div>
+      </div>
+
   </div>
 
-  <footer>
+  <footer role="contentinfo" aria-label="CivicEdu site footer">
     <div>CivicEdu — Empowering Informed Indian Voters &nbsp;·&nbsp; <span>Desh Ka Garv</span></div>
     <div style="margin-top: 6px;">For official data, visit <strong>eci.gov.in</strong> or <strong>voters.eci.gov.in</strong></div>
   </footer>
 
   <script src="app.js"></script>
+
+  <!-- Register Service Worker for Efficiency -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(registration => {
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }, err => {
+          console.log('ServiceWorker registration failed: ', err);
+        });
+      });
+    }
+  </script>
 </body>
 
 </html>

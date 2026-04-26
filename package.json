@@ -1,0 +1,44 @@
+{
+  "name": "civicedu",
+  "version": "1.0.0",
+  "description": "Indian Election Process Education Platform — Built with Google Services",
+  "main": "app.js",
+  "scripts": {
+    "test": "jest --coverage --verbose",
+    "test:security": "jest __tests__/security.test.js --verbose",
+    "test:navigation": "jest __tests__/navigation.test.js --verbose",
+    "test:chatbot": "jest __tests__/chatbot.test.js --verbose",
+    "test:app": "jest __tests__/app.test.js --verbose",
+    "test:all": "jest --coverage --verbose --testPathPattern='__tests__'",
+    "start": "python -m http.server 8000"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "collectCoverageFrom": [
+      "app.js",
+      "tests.js"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "functions": 70,
+        "lines": 70
+      }
+    },
+    "coverageReporters": ["text", "lcov"],
+    "testMatch": ["**/__tests__/**/*.test.js"]
+  },
+  "keywords": [
+    "civic-education",
+    "election",
+    "india",
+    "google-services",
+    "firebase",
+    "accessibility"
+  ],
+  "author": "CivicEdu Team",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  }
+}

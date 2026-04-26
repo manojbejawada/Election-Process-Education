@@ -9,11 +9,11 @@
 :root {
   --ink: #0d0d0d;
   --ink-2: #3a3a3a;
-  --ink-3: #6b6b6b;
+  --ink-3: #545454; /* Darkened for accessibility contrast */
   --paper: #faf8f3;
   --paper-2: #f0ede4;
   --paper-3: #e5e0d4;
-  --saffron: #ff9933;
+  --saffron: #e67300; /* Darkened for WCAG compliance */
   --saffron-light: #fff4e6;
   --navy: #000080;
   --navy-light: #e6e6f2;
@@ -25,6 +25,37 @@
   --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.14);
   --radius: 12px;
   --radius-sm: 8px;
+}
+
+/* Accessibility: Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Accessibility: Skip to main content link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--navy);
+  color: white;
+  padding: 8px;
+  z-index: 1000;
+  transition: top 0.2s;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* Accessibility: Focus visible for interactive clarity */
+:focus-visible {
+  outline: 3px solid var(--saffron);
+  outline-offset: 2px;
 }
 
 /* GOOGLE TRANSLATE STYLING */

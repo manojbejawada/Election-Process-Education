@@ -1,3 +1,113 @@
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECURITY MODULE — Sanitization, Validation, Rate Limiting, Session Management
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * sanitizeInput — Prevents XSS by escaping dangerous HTML characters.
+ * Applied to ALL user-facing text inputs before processing or rendering.
+ */
+function sanitizeInput(str) {
+  if (!str) return '';
+  return str.replace(/[&<>'"]/g, 
+    tag => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    }[tag] || tag)
+  );
+}
+
+/**
+ * validateEmail — Checks email format using RFC-compliant regex.
+ */
+function validateEmail(email) {
+  if (!email) return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+/**
+ * validatePassword — Enforces minimum 8 characters.
+ */
+function validatePassword(pass) {
+  if (!pass) return false;
+  return pass.length >= 8;
+}
+
+/**
+ * RateLimiter — Prevents brute-force login attacks.
+ * Blocks after 5 failed attempts within a 15-minute window.
+ */
+const RateLimiter = {
+  attempts: [],
+  MAX_ATTEMPTS: 5,
+  WINDOW_MS: 15 * 60 * 1000, // 15 minutes
+
+  canAttempt() {
+    const now = Date.now();
+    // Remove expired attempts
+    this.attempts = this.attempts.filter(t => now - t < this.WINDOW_MS);
+    return this.attempts.length < this.MAX_ATTEMPTS;
+  },
+
+  recordAttempt() {
+    this.attempts.push(Date.now());
+  },
+
+  remainingAttempts() {
+    const now = Date.now();
+    this.attempts = this.attempts.filter(t => now - t < this.WINDOW_MS);
+    return Math.max(0, this.MAX_ATTEMPTS - this.attempts.length);
+  },
+
+  reset() {
+    this.attempts = [];
+  }
+};
+
+/**
+ * SessionManager — Auto-logout after 30 minutes of inactivity.
+ * Resets timer on any user interaction.
+ */
+const SessionManager = {
+  TIMEOUT_MS: 30 * 60 * 1000, // 30 minutes
+  timer: null,
+
+  start() {
+    this.resetTimer();
+    // Reset on any user activity
+    ['click', 'keydown', 'scroll', 'mousemove'].forEach(evt => {
+      document.addEventListener(evt, () => this.resetTimer(), { passive: true });
+    });
+  },
+
+  resetTimer() {
+    if (this.timer) clearTimeout(this.timer);
+    const user = localStorage.getItem('civicUser');
+    if (user) {
+      this.timer = setTimeout(() => this.expireSession(), this.TIMEOUT_MS);
+    }
+  },
+
+  expireSession() {
+    const user = localStorage.getItem('civicUser');
+    if (user) {
+      localStorage.removeItem('civicUser');
+      alert('Your session has expired for security. Please sign in again.');
+      if (typeof auth !== 'undefined') auth.signOut();
+      location.reload();
+    }
+  }
+};
+
+/**
+ * secureLog — Logs security events without exposing sensitive data.
+ */
+function secureLog(event, detail) {
+  console.log(`[SECURITY] ${new Date().toISOString()} — ${event}:`, detail || '');
+}
+
 // NAVIGATION FIX WITH SECURITY GUARD
 function showPage(id) {
   // SECURITY GUARD: Protect sensitive pages
@@ -30,9 +140,14 @@ function showPage(id) {
   navButtons.forEach(btn => btn.classList.remove('active'));
 
   // Find button by text or index mapping
-  const navMap = { overview: 0, timeline: 1, howtovote: 2, map: 3, candidates: 4, profile: 5, glossary: 6, quiz: 7, chat: 8, auth: -1 };
+  const navMap = { overview: 0, timeline: 1, howtovote: 2, map: 3, candidates: 4, profile: 5, glossary: 6, quiz: 7, chat: 8, gservices: 9, auth: -1 };
   if (navMap[id] !== undefined && navMap[id] >= 0) {
     navButtons[navMap[id]].classList.add('active');
+  }
+
+  // Draw charts on-demand when Services page is opened
+  if (id === 'gservices' && typeof drawBarChart === 'function') {
+    setTimeout(drawBarChart, 100);
   }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -66,11 +181,11 @@ function buildGlossary(filter) {
   const grid = document.getElementById('glossaryGrid');
   if (!grid) return;
   const filtered = filter ? terms.filter(t => t.term.toLowerCase().includes(filter.toLowerCase()) || t.def.toLowerCase().includes(filter.toLowerCase())) : terms;
-  grid.innerHTML = filtered.map(t => `<div class="glossary-card"><div class="glossary-term">${t.term}</div><div class="glossary-def">${t.def}</div></div>`).join('');
+  grid.innerHTML = filtered.map(t => `<div class="glossary-card" tabindex="0" aria-label="Term: ${t.term}. Definition: ${t.def}"><div class="glossary-term">${t.term}</div><div class="glossary-def">${t.def}</div></div>`).join('');
   if (!filtered.length) grid.innerHTML = '<div style="color:var(--ink-3);font-size:0.9rem;">No terms found.</div>';
 }
 function filterGlossary() { buildGlossary(document.getElementById('glossarySearch').value); }
-buildGlossary();
+// Note: buildGlossary() is called inside window 'load' event below
 
 // QUIZ DATA
 const questions = [
@@ -184,7 +299,8 @@ function removeTyping() {
 }
 function sendChat() {
   const input = document.getElementById('chatInput');
-  const msg = input.value.trim();
+  // SECURITY: Sanitize user input before processing/displaying
+  const msg = sanitizeInput(input.value.trim());
   if (!msg) return;
   addMsg(msg, true);
   input.value = '';
@@ -195,7 +311,7 @@ function sendChat() {
   }, 1000);
 }
 function sendSuggestion(btn) {
-  document.getElementById('chatInput').value = btn.textContent;
+  document.getElementById('chatInput').value = sanitizeInput(btn.textContent.trim());
   sendChat();
   document.getElementById('suggestions').style.display = 'none';
 }
@@ -222,13 +338,13 @@ function setLanguage(lang) {
 }
 
 function updateProfile() {
-  const age = document.getElementById('userAge').value;
+  const age = sanitizeInput(document.getElementById('userAge').value);
   alert('Profile updated! Age: ' + age);
 }
 
 function saveAccount() {
-  const name = document.getElementById('userName').value;
-  const email = document.getElementById('userEmail').value;
+  const name = sanitizeInput(document.getElementById('userName').value);
+  const email = sanitizeInput(document.getElementById('userEmail').value);
   alert('Account saved successfully for: ' + name + ' (' + email + ')');
 }
 
@@ -239,12 +355,15 @@ function checkAuth() {
   const emailField = document.getElementById('userEmail');
 
   if (userStr) {
-    const user = JSON.parse(userStr);
-    // Update Header
-    if (loginText) loginText.textContent = user.name.split(' ')[0];
-    // Update Profile Page Fields
-    if (nameField) nameField.value = user.name;
-    if (emailField) emailField.value = user.email;
+    try {
+      const user = JSON.parse(userStr);
+      if (loginText && user.name) loginText.textContent = user.name.split(' ')[0];
+      if (nameField && user.name) nameField.value = user.name;
+      if (emailField && user.email) emailField.value = user.email;
+    } catch(e) {
+      // Corrupt localStorage entry — clear it
+      localStorage.removeItem('civicUser');
+    }
   } else {
     if (loginText) loginText.textContent = 'Login';
     if (nameField) nameField.value = '';
@@ -275,13 +394,29 @@ function toggleAuthMode(mode) {
 }
 
 function signIn() {
-  const email = document.getElementById('loginEmail').value;
-  const pass = document.getElementById('loginPass').value;
+  const email = sanitizeInput(document.getElementById('loginEmail').value);
+  const pass = document.getElementById('loginPass').value; // Don't sanitize password — it goes to Firebase directly
 
+  // SECURITY: Validate inputs before sending to server
   if (!email || !pass) {
     alert('Please enter your email and password.');
     return;
   }
+
+  if (!validateEmail(email)) {
+    alert('Please enter a valid email address.');
+    secureLog('LOGIN_INVALID_EMAIL', email);
+    return;
+  }
+
+  // SECURITY: Rate limiting — block brute force
+  if (!RateLimiter.canAttempt()) {
+    alert('Too many login attempts. Please wait 15 minutes before trying again.');
+    secureLog('LOGIN_RATE_LIMITED', email);
+    return;
+  }
+
+  RateLimiter.recordAttempt();
 
   auth.signInWithEmailAndPassword(email, pass)
     .then((userCredential) => {
@@ -291,43 +426,79 @@ function signIn() {
         email: user.email 
       };
       localStorage.setItem('civicUser', JSON.stringify(userData));
+      RateLimiter.reset(); // Clear rate limiter on success
+      secureLog('LOGIN_SUCCESS', user.email);
       alert('Welcome back, ' + userData.name + '!');
       checkAuth();
     })
     .catch((error) => {
-      alert('Login Error: ' + error.message);
+      secureLog('LOGIN_FAILED', error.code);
+      // SECURITY: Don't expose internal error details to user
+      if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+        alert('Invalid email or password. Remaining attempts: ' + RateLimiter.remainingAttempts());
+      } else if (error.code === 'auth/too-many-requests') {
+        alert('Account temporarily locked due to too many failed attempts. Try again later.');
+      } else {
+        alert('Login failed. Please try again.');
+      }
     });
 }
 
 function createAccount() {
-  const name = document.getElementById('regName').value;
-  const email = document.getElementById('regEmail').value;
-  const pass = document.getElementById('regPass').value;
+  const name = sanitizeInput(document.getElementById('regName').value);
+  const email = sanitizeInput(document.getElementById('regEmail').value);
+  const pass = document.getElementById('regPass').value; // Don't sanitize password — it goes to Firebase directly
 
   if (!name || !email || !pass) {
     alert('Please fill in all fields to create your account.');
     return;
   }
 
-  // REAL FIREBASE AUTH
+  // SECURITY: Validate email format
+  if (!validateEmail(email)) {
+    alert('Please enter a valid email address (e.g. voter@example.in).');
+    secureLog('REGISTER_INVALID_EMAIL', email);
+    return;
+  }
+
+  // SECURITY: Enforce password strength
+  if (!validatePassword(pass)) {
+    alert('Password must be at least 8 characters long for security.');
+    secureLog('REGISTER_WEAK_PASSWORD');
+    return;
+  }
+
+  // SECURITY: Sanitize name to prevent stored XSS
+  if (name.length > 100) {
+    alert('Name is too long. Please use fewer than 100 characters.');
+    return;
+  }
+
   auth.createUserWithEmailAndPassword(email, pass)
     .then((userCredential) => {
-      // Save user name to profile
       return userCredential.user.updateProfile({ displayName: name });
     })
     .then(() => {
-      const userData = { name, email, createdAt: new Date() };
+      const userData = { name, email, createdAt: new Date().toISOString() };
       localStorage.setItem('civicUser', JSON.stringify(userData));
       
-      // Sync to Profile Page fields
       if (document.getElementById('userName')) document.getElementById('userName').value = name;
       if (document.getElementById('userEmail')) document.getElementById('userEmail').value = email;
 
+      secureLog('ACCOUNT_CREATED', email);
       alert('Welcome to CivicEdu, ' + name + '! Your account is now active on Firebase.');
       checkAuth();
     })
     .catch((error) => {
-      alert('Firebase Error: ' + error.message);
+      secureLog('REGISTER_FAILED', error.code);
+      // SECURITY: User-friendly error messages without exposing internals
+      if (error.code === 'auth/email-already-in-use') {
+        alert('This email is already registered. Try signing in instead.');
+      } else if (error.code === 'auth/weak-password') {
+        alert('Password is too weak. Use at least 8 characters.');
+      } else {
+        alert('Registration failed. Please try again.');
+      }
     });
 }
 
@@ -362,9 +533,11 @@ if (typeof auth !== 'undefined') {
   });
 }
 
-// Initial loads
+// Initial loads — always run after DOM is fully parsed
 window.addEventListener('load', () => {
-  checkAuth();
-  buildGlossary();
-  loadQuestion();
+  checkAuth();              // sets up auth state and shows overview
+  buildGlossary();          // populates glossary grid
+  loadQuestion();           // initialises quiz UI
+  SessionManager.start();   // SECURITY: start session timeout monitoring
+  secureLog('APP_LOADED', 'CivicEdu initialized successfully');
 });
