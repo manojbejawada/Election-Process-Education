@@ -4,1536 +4,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CivicEdu — India Election Assistant</title>
+  <title>CivicEdu — Indian Election Process Education</title>
+
+  <!-- Google Fonts: Playfair Display for Serifs, DM Sans for UI -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap"
-    rel="stylesheet">
-  <script type="text/javascript">
-    function googleTranslateElementInit() {
-      new google.translate.TranslateElement({ pageLanguage: 'en', includedLanguages: 'te,hi,en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE }, 'google_translate_element');
-    }
-  </script>
-  <script type="text/javascript"
-    src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+
+  <!-- FIREBASE SDKS -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBDtzg9pdejlwyyHGKavxebTDjtJbumDAA",
-      authDomain: "election-1e3d6.firebaseapp.com",
-      projectId: "election-1e3d6",
-      storageBucket: "election-1e3d6.firebasestorage.app",
-      messagingSenderId: "348972987840",
-      appId: "1:348972987840:web:69ec63bea8b8fc30cc4425",
-      measurementId: "G-6SBXE2B46S"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-
-    function createAccount() {
-      const email = document.getElementById('auth-email').value;
-      const pass = document.getElementById('auth-pass').value;
-      auth.createUserWithEmailAndPassword(email, pass)
-        .then(() => {
-          alert('Account created!');
-          toggleAuth();
-        })
-        .catch(err => alert(err.message));
+  <!-- Google Translate -->
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'hi,te,en',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+      }, 'google_translate_element');
     }
   </script>
-  <style>
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --ink: #0d0d0d;
-      --ink-2: #3a3a3a;
-      --ink-3: #6b6b6b;
-      --paper: #faf8f3;
-      --paper-2: #f0ede4;
-      --paper-3: #e5e0d4;
-      --saffron: #ff9933;
-      --saffron-light: #fff4e6;
-      --navy: #000080;
-      --navy-light: #e6e6f2;
-      --navy-mid: #0000a5;
-      --green: #138808;
-      --green-light: #e7f3e6;
-      --border: rgba(0, 0, 0, 0.1);
-      --shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
-      --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.14);
-      --radius: 12px;
-      --radius-sm: 8px;
-    }
-
-    /* GOOGLE TRANSLATE STYLING */
-    #google_translate_element {
-      margin-left: 1.5rem;
-    }
-
-    .goog-te-gadget-simple {
-      background-color: rgba(255, 255, 255, 0.1) !important;
-      border: 1px solid rgba(255, 255, 255, 0.2) !important;
-      padding: 4px 8px !important;
-      border-radius: 8px !important;
-      font-family: 'DM Sans', sans-serif !important;
-      font-size: 0.8rem !important;
-      display: flex !important;
-      align-items: center !important;
-    }
-
-    .goog-te-gadget-icon {
-      display: none !important;
-    }
-
-    .goog-te-menu-value span {
-      color: white !important;
-      margin-right: 4px !important;
-    }
-
-    .goog-te-menu-value img {
-      display: none !important;
-    }
-
-    iframe.goog-te-banner-frame {
-      display: none !important;
-    }
-
-    body {
-      top: 0px !important;
-    }
-
-    .login-btn {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: white;
-      padding: 6px 16px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-left: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .login-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: white;
-    }
-
-    .login-btn .user-icon {
-      font-size: 1rem;
-    }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--paper);
-      color: var(--ink);
-      min-height: 100vh;
-      line-height: 1.6;
-    }
-
-    /* HEADER */
-    header {
-      background: var(--navy);
-      color: white;
-      padding: 0 2rem;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    .header-inner {
-      width: 100%;
-      padding: 0 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 64px;
-    }
-
-    .logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.6rem;
-      font-weight: 900;
-      letter-spacing: -0.5px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .logo-icon {
-      width: 32px;
-      height: 32px;
-      background: var(--saffron);
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-    }
-
-    .header-controls {
-      display: flex;
-      align-items: center;
-    }
-
-    nav {
-      display: flex;
-      gap: 4px;
-    }
-
-    nav button {
-      background: none;
-      border: none;
-      color: rgba(255, 255, 255, 0.75);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 500;
-      padding: 6px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    nav button:hover,
-    nav button.active {
-      background: rgba(255, 255, 255, 0.15);
-      color: white;
-    }
-
-    /* HERO */
-    .hero {
-      background: var(--navy);
-      color: white;
-      padding: 4rem 2rem 3rem;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at 30% 50%, rgba(255, 153, 51, 0.15) 0%, transparent 60%),
-        radial-gradient(ellipse at 70% 30%, rgba(19, 136, 8, 0.1) 0%, transparent 50%);
-      pointer-events: none;
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.12);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 20px;
-      padding: 5px 14px;
-      font-size: 0.78rem;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      margin-bottom: 1.2rem;
-    }
-
-    .hero h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2.2rem, 5vw, 3.6rem);
-      font-weight: 900;
-      line-height: 1.1;
-      margin-bottom: 1rem;
-      max-width: 750px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .hero h1 span {
-      color: var(--saffron);
-    }
-
-    .hero p {
-      font-size: 1.05rem;
-      color: rgba(255, 255, 255, 0.8);
-      max-width: 550px;
-      margin: 0 auto 2rem;
-    }
-
-    .hero-btns {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .btn-primary {
-      background: var(--saffron);
-      color: white;
-      border: none;
-      padding: 13px 28px;
-      border-radius: var(--radius-sm);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn-primary:hover {
-      background: #e68a00;
-      transform: translateY(-1px);
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.12);
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      padding: 13px 28px;
-      border-radius: var(--radius-sm);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
-
-    /* QUICK TOPICS */
-    .quick-topics {
-      background: var(--paper-2);
-      border-bottom: 1px solid var(--border);
-      padding: 1rem 2rem;
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-
-    .topics-inner {
-      width: 100%;
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .topics-label {
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--ink-3);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      flex-shrink: 0;
-      margin-right: 4px;
-    }
-
-    .topic-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 5px 14px;
-      font-size: 0.82rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .topic-chip:hover {
-      background: var(--navy);
-      color: white;
-      border-color: var(--navy);
-    }
-
-    .topic-chip.active {
-      background: var(--navy);
-      color: white;
-      border-color: var(--navy);
-    }
-
-    /* MAIN CONTENT */
-    .main {
-      width: 100%;
-      padding: 2.5rem 2rem;
-    }
-
-    /* SECTION PAGES */
-    .page {
-      display: none;
-    }
-
-    .page.active {
-      display: block;
-      animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* OVERVIEW CARDS */
-    .section-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.7rem;
-      font-weight: 700;
-      margin-bottom: 0.4rem;
-    }
-
-    .section-sub {
-      color: var(--ink-3);
-      margin-bottom: 2rem;
-      font-size: 0.95rem;
-    }
-
-    .overview-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.2rem;
-      margin-bottom: 2.5rem;
-    }
-
-    .overview-card {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.4rem;
-      cursor: pointer;
-      transition: all 0.25s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .overview-card::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 4px;
-    }
-
-    .overview-card.saffron::before {
-      background: var(--saffron);
-    }
-
-    .overview-card.navy::before {
-      background: var(--navy-mid);
-    }
-
-    .overview-card.green::before {
-      background: var(--green);
-    }
-
-    .overview-card:hover {
-      box-shadow: var(--shadow);
-      transform: translateY(-2px);
-    }
-
-    .card-icon {
-      font-size: 1.6rem;
-      margin-bottom: 0.7rem;
-    }
-
-    .card-title {
-      font-weight: 600;
-      font-size: 1rem;
-      margin-bottom: 0.3rem;
-    }
-
-    .card-desc {
-      font-size: 0.84rem;
-      color: var(--ink-3);
-      line-height: 1.5;
-    }
-
-    .card-arrow {
-      position: absolute;
-      right: 1rem;
-      bottom: 1rem;
-      font-size: 0.75rem;
-      color: var(--ink-3);
-      background: var(--paper-2);
-      border-radius: 4px;
-      padding: 2px 8px;
-      font-weight: 500;
-    }
-
-    /* TIMELINE */
-    .timeline {
-      position: relative;
-    }
-
-    .timeline::before {
-      content: '';
-      position: absolute;
-      left: 30px;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: linear-gradient(to bottom, var(--saffron), var(--green));
-    }
-
-    .tl-item {
-      display: flex;
-      gap: 1.2rem;
-      margin-bottom: 1.5rem;
-      animation: fadeIn 0.4s ease both;
-    }
-
-    .tl-dot {
-      width: 62px;
-      height: 62px;
-      border-radius: 50%;
-      background: white;
-      border: 3px solid var(--saffron);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-size: 1.3rem;
-      position: relative;
-      z-index: 1;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .tl-dot.navy {
-      border-color: var(--navy-mid);
-    }
-
-    .tl-dot.green {
-      border-color: var(--green);
-    }
-
-    .tl-content {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.2rem 1.4rem;
-      flex: 1;
-      box-shadow: var(--shadow);
-    }
-
-    .tl-phase {
-      font-size: 0.72rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: var(--saffron);
-      margin-bottom: 4px;
-    }
-
-    .tl-phase.navy {
-      color: var(--navy-mid);
-    }
-
-    .tl-phase.green {
-      color: var(--green);
-    }
-
-    .tl-title {
-      font-weight: 700;
-      font-size: 1.05rem;
-      margin-bottom: 4px;
-    }
-
-    .tl-timing {
-      font-size: 0.8rem;
-      color: var(--ink-3);
-      margin-bottom: 0.6rem;
-    }
-
-    .tl-desc {
-      font-size: 0.88rem;
-      color: var(--ink-2);
-      line-height: 1.6;
-    }
-
-    .tl-steps {
-      margin-top: 0.8rem;
-      padding-left: 0;
-      list-style: none;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .tl-steps li {
-      background: var(--paper-2);
-      border-radius: 4px;
-      padding: 3px 10px;
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: var(--ink-2);
-    }
-
-    /* STEPS (How to Vote) */
-    .steps-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 1rem;
-    }
-
-    .step-card {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.4rem;
-      position: relative;
-    }
-
-    .step-num {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--saffron);
-      color: white;
-      font-weight: 700;
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 0.8rem;
-    }
-
-    .step-num.navy {
-      background: var(--navy-mid);
-    }
-
-    .step-num.green {
-      background: var(--green);
-    }
-
-    .step-title {
-      font-weight: 600;
-      font-size: 0.95rem;
-      margin-bottom: 0.4rem;
-    }
-
-    .step-desc {
-      font-size: 0.83rem;
-      color: var(--ink-3);
-      line-height: 1.55;
-    }
-
-    /* GLOSSARY */
-    .glossary-search {
-      width: 100%;
-      padding: 12px 18px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
-      background: white;
-      margin-bottom: 1.5rem;
-      transition: border-color 0.2s;
-      outline: none;
-    }
-
-    .glossary-search:focus {
-      border-color: var(--navy-mid);
-    }
-
-    .glossary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1rem;
-    }
-
-    .glossary-card {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 1rem 1.2rem;
-    }
-
-    .glossary-term {
-      font-weight: 700;
-      font-size: 0.95rem;
-      color: var(--navy);
-      margin-bottom: 4px;
-    }
-
-    .glossary-def {
-      font-size: 0.84rem;
-      color: var(--ink-2);
-      line-height: 1.55;
-    }
-
-    /* QUIZ */
-    .quiz-wrap {
-      max-width: 700px;
-    }
-
-    .quiz-progress {
-      height: 6px;
-      background: var(--paper-3);
-      border-radius: 3px;
-      margin-bottom: 2rem;
-      overflow: hidden;
-    }
-
-    .quiz-bar {
-      height: 100%;
-      background: var(--saffron);
-      border-radius: 3px;
-      transition: width 0.4s ease;
-    }
-
-    .quiz-q-num {
-      font-size: 0.8rem;
-      color: var(--ink-3);
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-
-    .quiz-question {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.35rem;
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-      line-height: 1.4;
-    }
-
-    .quiz-options {
-      display: grid;
-      gap: 10px;
-    }
-
-    .quiz-opt {
-      background: white;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 1rem 1.2rem;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.92rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-align: left;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .quiz-opt:hover:not(:disabled) {
-      border-color: var(--navy-mid);
-      background: var(--navy-light);
-    }
-
-    .quiz-opt.correct {
-      background: var(--green-light);
-      border-color: var(--green);
-      color: var(--green);
-    }
-
-    .quiz-opt.wrong {
-      background: var(--saffron-light);
-      border-color: var(--saffron);
-      color: var(--saffron);
-    }
-
-    .quiz-opt:disabled {
-      cursor: default;
-    }
-
-    .quiz-opt-letter {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: var(--paper-2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.78rem;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-
-    .quiz-feedback {
-      margin-top: 1rem;
-      padding: 1rem 1.2rem;
-      border-radius: var(--radius-sm);
-      font-size: 0.88rem;
-      line-height: 1.6;
-      display: none;
-    }
-
-    .quiz-feedback.show {
-      display: block;
-    }
-
-    .quiz-feedback.correct {
-      background: var(--green-light);
-      color: var(--green);
-      border: 1px solid var(--green);
-    }
-
-    .quiz-feedback.wrong {
-      background: var(--saffron-light);
-      color: var(--saffron);
-      border: 1px solid var(--saffron);
-    }
-
-    .quiz-nav {
-      margin-top: 1.5rem;
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .btn-quiz {
-      background: var(--navy);
-      color: white;
-      border: none;
-      padding: 11px 22px;
-      border-radius: var(--radius-sm);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .btn-quiz:hover {
-      background: var(--navy-mid);
-    }
-
-    .btn-quiz:disabled {
-      opacity: 0.4;
-      cursor: default;
-    }
-
-    .quiz-score {
-      display: none;
-      text-align: center;
-      padding: 2rem 0;
-    }
-
-    .quiz-score.show {
-      display: block;
-    }
-
-    .score-ring {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      background: var(--navy);
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1.5rem;
-      font-family: 'Playfair Display', serif;
-    }
-
-    .score-num {
-      font-size: 2.2rem;
-      font-weight: 900;
-      line-height: 1;
-    }
-
-    .score-of {
-      font-size: 0.75rem;
-      opacity: 0.7;
-    }
-
-    /* AI CHAT */
-    .chat-wrap {
-      max-width: 760px;
-    }
-
-    .chat-window {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      height: 420px;
-      overflow-y: auto;
-      padding: 1.2rem;
-      margin-bottom: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .msg {
-      display: flex;
-      gap: 10px;
-      animation: fadeIn 0.25s ease;
-    }
-
-    .msg.user {
-      flex-direction: row-reverse;
-    }
-
-    .msg-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: var(--navy);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: white;
-      flex-shrink: 0;
-    }
-
-    .msg.user .msg-avatar {
-      background: var(--saffron);
-    }
-
-    .msg-bubble {
-      background: var(--paper-2);
-      border-radius: 12px 12px 12px 4px;
-      padding: 0.75rem 1rem;
-      font-size: 0.88rem;
-      line-height: 1.6;
-      max-width: 78%;
-      color: var(--ink);
-    }
-
-    .msg.user .msg-bubble {
-      background: var(--navy);
-      color: white;
-      border-radius: 12px 12px 4px 12px;
-    }
-
-    .chat-input-row {
-      display: flex;
-      gap: 10px;
-    }
-
-    .chat-input {
-      flex: 1;
-      padding: 12px 16px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.92rem;
-      outline: none;
-      transition: border-color 0.2s;
-      background: white;
-    }
-
-    .chat-input:focus {
-      border-color: var(--navy-mid);
-    }
-
-    .chat-send {
-      background: var(--navy);
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: var(--radius-sm);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .chat-send:hover {
-      background: var(--navy-mid);
-    }
-
-    .chat-suggestions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 1rem;
-    }
-
-    .sug-chip {
-      background: var(--paper-2);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 5px 12px;
-      font-size: 0.8rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .sug-chip:hover {
-      background: var(--navy);
-      color: white;
-      border-color: var(--navy);
-    }
-
-    .typing {
-      display: flex;
-      gap: 4px;
-      align-items: center;
-      padding: 0.5rem;
-    }
-
-    .typing span {
-      width: 7px;
-      height: 7px;
-      background: var(--ink-3);
-      border-radius: 50%;
-      animation: bounce 1.2s infinite;
-    }
-
-    .typing span:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-
-    .typing span:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-
-    @keyframes bounce {
-
-      0%,
-      60%,
-      100% {
-        transform: translateY(0);
-      }
-
-      30% {
-        transform: translateY(-6px);
-      }
-    }
-
-    /* MAP PAGE STYLES */
-    .map-layout {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 1.5rem;
-      margin-top: 1.5rem;
-    }
-
-    .map-container {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      height: 600px;
-      box-shadow: var(--shadow);
-      position: relative;
-    }
-
-    .map-container iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    .map-overlay {
-      position: absolute;
-      top: 1rem;
-      left: 1rem;
-      display: flex;
-      gap: 8px;
-    }
-
-    .map-tag {
-      background: white;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .map-tag .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-    }
-
-    .constituency-info {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-      box-shadow: var(--shadow);
-    }
-
-    .const-label {
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--ink-3);
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-
-    .const-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.6rem;
-      font-weight: 900;
-      color: var(--navy);
-      margin-bottom: 1rem;
-    }
-
-    .const-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .stat-box {
-      border-top: 1px solid var(--border);
-      padding-top: 8px;
-    }
-
-    .stat-label {
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: var(--ink-3);
-      text-transform: uppercase;
-    }
-
-    .stat-val {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--navy);
-    }
-
-    .booth-list {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      box-shadow: var(--shadow);
-    }
-
-    .booth-item {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .booth-item:last-child {
-      border: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .booth-num {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      background: var(--navy-light);
-      color: var(--navy);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-
-    .booth-num.active {
-      background: var(--saffron);
-      color: white;
-    }
-
-    .booth-content {
-      flex: 1;
-    }
-
-    .booth-name {
-      font-size: 0.9rem;
-      font-weight: 700;
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .booth-badge {
-      background: var(--saffron-light);
-      color: var(--saffron);
-      font-size: 0.6rem;
-      padding: 2px 6px;
-      border-radius: 4px;
-      text-transform: uppercase;
-    }
-
-    .booth-address {
-      font-size: 0.75rem;
-      color: var(--ink-3);
-      line-height: 1.4;
-      margin-bottom: 8px;
-    }
-
-    .booth-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .action-link {
-      font-size: 0.75rem;
-      color: var(--navy-mid);
-      font-weight: 600;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .action-link:hover {
-      text-decoration: underline;
-    }
-
-    @media (max-width: 900px) {
-      .map-layout {
-        grid-template-columns: 1fr;
-      }
-
-      .map-container {
-        height: 400px;
-      }
-    }
-
-    /* CANDIDATE STYLES */
-    .candidate-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
-      margin-top: 1.5rem;
-    }
-
-    .candidate-card {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      position: relative;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .candidate-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .candidate-party-bar {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 4px;
-    }
-
-    .candidate-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.2rem;
-    }
-
-    .candidate-symbol {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: var(--paper-2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-    }
-
-    .candidate-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--navy);
-    }
-
-    .candidate-party {
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .candidate-info {
-      border-top: 1px solid var(--border);
-      padding-top: 1rem;
-      margin-top: 1rem;
-    }
-
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 6px;
-      font-size: 0.85rem;
-    }
-
-    .info-label {
-      color: var(--ink-3);
-    }
-
-    .info-val {
-      font-weight: 600;
-      color: var(--ink);
-    }
-
-    /* FOOTER */
-    footer {
-      background: var(--ink);
-      color: rgba(255, 255, 255, 0.6);
-      text-align: center;
-      padding: 2rem;
-      font-size: 0.82rem;
-      margin-top: 4rem;
-    }
-
-    footer span {
-      color: white;
-    }
-
-    /* RESPONSIVE */
-    }
-
-    /* PROFILE STYLES */
-    .profile-layout {
-      max-width: 600px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-
-    .profile-card {
-      background: white;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      padding: 1.5rem;
-      box-shadow: var(--shadow);
-    }
-
-    .profile-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 1.5rem;
-      font-family: 'Playfair Display', serif;
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--navy);
-    }
-
-    .profile-label {
-      display: block;
-      font-size: 0.85rem;
-      color: var(--ink-3);
-      margin-bottom: 8px;
-    }
-
-    .profile-input {
-      width: 100%;
-      padding: 12px 16px;
-      background: var(--paper);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      font-family: inherit;
-      font-size: 1rem;
-      margin-bottom: 1.2rem;
-    }
-
-    .voter-type-toggle {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 1.5rem;
-    }
-
-    .type-btn {
-      padding: 12px;
-      border: 1px solid var(--border);
-      background: var(--paper);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--ink-2);
-      transition: all 0.2s;
-    }
-
-    .type-btn.active {
-      background: white;
-      border-color: var(--navy);
-      color: var(--navy);
-      border-width: 2px;
-    }
-
-    .update-btn {
-      width: 100%;
-      padding: 14px;
-      background: var(--navy);
-      color: white;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-weight: 700;
-      font-size: 1rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .lang-option {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 16px;
-      background: var(--paper);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      margin-bottom: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .lang-option:hover {
-      background: #eeebe0;
-    }
-
-    .lang-option.active {
-      background: white;
-      border-color: var(--navy);
-    }
-
-    .lang-name {
-      font-weight: 600;
-      color: var(--navy);
-    }
-
-    .lang-sub {
-      font-size: 0.75rem;
-      color: var(--ink-3);
-      margin-left: 8px;
-      font-weight: 400;
-    }
-
-    .access-info {
-      background: var(--paper);
-      padding: 1rem;
-      border-radius: var(--radius-sm);
-      font-size: 0.85rem;
-      color: var(--ink-2);
-      line-height: 1.5;
-    }
-
-    /* AUTH PAGE */
-    .auth-container {
-      max-width: 450px;
-      margin: 4rem auto;
-      background: white;
-      padding: 2.5rem;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-lg);
-      text-align: center;
-    }
-
-    .auth-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 2rem;
-      font-weight: 900;
-      color: var(--navy);
-      margin-bottom: 0.5rem;
-    }
-
-    .auth-sub {
-      color: var(--ink-3);
-      font-size: 0.95rem;
-      margin-bottom: 2rem;
-    }
-
-    .auth-form {
-      text-align: left;
-    }
-
-    .auth-input {
-      width: 100%;
-      padding: 14px 18px;
-      background: var(--paper);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      font-family: inherit;
-      font-size: 1rem;
-      margin-bottom: 1.2rem;
-    }
-
-    .auth-btn {
-      width: 100%;
-      padding: 16px;
-      background: var(--navy);
-      color: white;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-weight: 700;
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: all 0.3s;
-      margin-top: 0.5rem;
-    }
-
-    .auth-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 20px rgba(0, 0, 128, 0.3);
-    }
-
-    .locked-app {
-      display: none;
-    }
-
-    .unlocked-app {
-      display: block;
-    }
-  </style>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+  <script>
+    // Initialize Firebase (Using your provided config)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDE-xxxxxxxxxxxxxxxxxxxx", // User's key
+      authDomain: "election-edu.firebaseapp.com",
+      projectId: "election-edu",
+      storageBucket: "election-edu.appspot.com",
+      messagingSenderId: "xxxxxxxxxxxx",
+      appId: "1:xxxxxxxxxxxx:web:xxxxxxxxxxxx"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
+
+  <link rel="stylesheet" href="styles.css">
+  <script src="tests.js"></script>
 </head>
 
-<body onload="checkAuth()">
+<body>
 
   <div id="main-app">
 
@@ -1544,16 +58,16 @@
           CivicEdu
         </div>
         <div class="header-controls">
-          <nav id="main-nav">
-            <button class="active" onclick="showPage('overview')">Overview</button>
-            <button onclick="showPage('timeline')">Timeline</button>
-            <button onclick="showPage('howtovote')">How to Vote</button>
-            <button onclick="showPage('map')">Constituency Map</button>
-            <button onclick="showPage('candidates')">Candidates</button>
-            <button onclick="showPage('profile')">Profile</button>
-            <button onclick="showPage('glossary')">Glossary</button>
-            <button onclick="showPage('quiz')">Quiz</button>
-            <button onclick="showPage('chat')">Ask Assistant</button>
+          <nav id="main-nav" aria-label="Main Navigation">
+            <button class="active" onclick="showPage('overview')" aria-label="Show Overview">Overview</button>
+            <button onclick="showPage('timeline')" aria-label="Show Election Timeline">Timeline</button>
+            <button onclick="showPage('howtovote')" aria-label="Show Voting Guide">How to Vote</button>
+            <button onclick="showPage('map')" aria-label="Show Constituency Map">Constituency Map</button>
+            <button onclick="showPage('candidates')" aria-label="Show Candidates">Candidates</button>
+            <button onclick="showPage('profile')" aria-label="Show Citizen Profile">Profile</button>
+            <button onclick="showPage('glossary')" aria-label="Show Election Glossary">Glossary</button>
+            <button onclick="showPage('quiz')" aria-label="Show Civics Quiz">Quiz</button>
+            <button onclick="showPage('chat')" aria-label="Show AI Assistant">Ask Assistant</button>
           </nav>
           <div id="google_translate_element"></div>
           <button id="header-login-btn" class="login-btn" onclick="toggleAuth()">
@@ -1570,8 +84,8 @@
       <p>Your interactive guide to the world's largest democratic process — from voter registration to the final
         mandate.</p>
       <div class="hero-btns">
-        <button class="btn-primary" onclick="showPage('howtovote')">📋 Voter Guide</button>
-        <button class="btn-secondary" onclick="showPage('chat')">💬 Ask AI Assistant</button>
+        <button class="btn-primary" onclick="showPage('howtovote')" aria-label="Open Voter Guide">📋 Voter Guide</button>
+        <button class="btn-secondary" onclick="showPage('chat')" aria-label="Start Chat with AI Assistant">💬 Ask AI Assistant</button>
       </div>
     </div>
 
@@ -1594,22 +108,19 @@
       <!-- OVERVIEW PAGE -->
       <div class="page active" id="page-overview">
         <div class="section-title">Welcome to CivicEdu</div>
-        <div class="section-sub">A comprehensive guide to Indian elections, designed for first-time and informed voters.
-        </div>
+        <div class="section-sub">A comprehensive guide to Indian elections, designed for first-time and informed voters.</div>
 
         <div class="overview-grid">
           <div class="overview-card saffron" onclick="showPage('timeline')">
             <div class="card-icon">📅</div>
             <div class="card-title">Election Timeline</div>
-            <div class="card-desc">From ECI announcement to the counting day — understand the lifecycle of an Indian
-              election.</div>
+            <div class="card-desc">From ECI announcement to the counting day — understand the lifecycle of an Indian election.</div>
             <div class="card-arrow">Explore →</div>
           </div>
           <div class="overview-card navy" onclick="showPage('howtovote')">
             <div class="card-icon">🗳️</div>
             <div class="card-title">How to Vote</div>
-            <div class="card-desc">Check your EPIC status, find your polling booth, and understand the EVM/VVPAT
-              process.</div>
+            <div class="card-desc">Check your EPIC status, find your polling booth, and understand the EVM/VVPAT process.</div>
             <div class="card-arrow">Explore →</div>
           </div>
           <div class="overview-card green" onclick="showPage('glossary')">
@@ -1633,8 +144,7 @@
           <div class="overview-card green">
             <div class="card-icon">📜</div>
             <div class="card-title">Types of Elections</div>
-            <div class="card-desc">Lok Sabha, Rajya Sabha, State Assemblies, and Local Bodies — learn the difference.
-            </div>
+            <div class="card-desc">Lok Sabha, Rajya Sabha, State Assemblies, and Local Bodies — learn the difference.</div>
             <div class="card-arrow">Learn More →</div>
           </div>
         </div>
@@ -1662,8 +172,7 @@
         </div>
 
         <!-- Stats strip -->
-        <div
-          style="background: var(--navy); color: white; border-radius: var(--radius); padding: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1.5rem; text-align: center;">
+        <div style="background: var(--navy); color: white; border-radius: var(--radius); padding: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1.5rem; text-align: center;">
           <div>
             <div style="font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 900;">543</div>
             <div style="font-size: 0.82rem; opacity: 0.75; margin-top: 4px;">Lok Sabha Seats</div>
@@ -1694,8 +203,7 @@
               <div class="tl-phase">Phase 1</div>
               <div class="tl-title">Announcement by ECI</div>
               <div class="tl-timing">⏱ Day 0</div>
-              <div class="tl-desc">The Election Commission of India (ECI) announces the full schedule. The Model Code of
-                Conduct (MCC) comes into force immediately.</div>
+              <div class="tl-desc">The Election Commission of India (ECI) announces the full schedule. The Model Code of Conduct (MCC) comes into force immediately.</div>
               <ul class="tl-steps">
                 <li>Schedule Release</li>
                 <li>MCC Applied</li>
@@ -1710,8 +218,7 @@
               <div class="tl-phase navy">Phase 2</div>
               <div class="tl-title">Notification & Nominations</div>
               <div class="tl-timing">⏱ Weeks 1–3</div>
-              <div class="tl-desc">Candidates file their nomination papers (Form 2B). They must disclose assets,
-                educational background, and criminal history.</div>
+              <div class="tl-desc">Candidates file their nomination papers (Form 2B). They must disclose assets, educational background, and criminal history.</div>
               <ul class="tl-steps">
                 <li>Filing Nominations</li>
                 <li>Scrutiny of papers</li>
@@ -1726,8 +233,7 @@
               <div class="tl-phase saffron">Phase 3</div>
               <div class="tl-title">Campaigning</div>
               <div class="tl-timing">⏱ Weeks 4–6</div>
-              <div class="tl-desc">Political parties release manifestos and hold rallies. Campaigning must stop 48 hours
-                before the conclusion of the poll in a constituency.</div>
+              <div class="tl-desc">Political parties release manifestos and hold rallies. Campaigning must stop 48 hours before the conclusion of the poll in a constituency.</div>
               <ul class="tl-steps">
                 <li>Manifesto Release</li>
                 <li>Public Rallies</li>
@@ -1742,8 +248,7 @@
               <div class="tl-phase green">Phase 4</div>
               <div class="tl-title">Polling Day</div>
               <div class="tl-timing">⏱ May 13, 2024 (Vijayawada)</div>
-              <div class="tl-desc">Citizens cast their votes using EVMs (Electronic Voting Machines) with VVPAT
-                verification. <strong>Polling Day for Vijayawada is May 13.</strong></div>
+              <div class="tl-desc">Citizens cast their votes using EVMs (Electronic Voting Machines) with VVPAT verification. <strong>Polling Day for Vijayawada is May 13.</strong></div>
               <ul class="tl-steps">
                 <li>Booth Setup</li>
                 <li>EVM Testing (Mock Poll)</li>
@@ -1763,8 +268,7 @@
               <div class="tl-phase navy">Phase 5</div>
               <div class="tl-title">Counting & Results</div>
               <div class="tl-timing">⏱ Result Day</div>
-              <div class="tl-desc">Votes are counted simultaneously across all constituencies. Result Trends are tracked
-                on the ECI website. Winners are formally certified.</div>
+              <div class="tl-desc">Votes are counted simultaneously across all constituencies. Result Trends are tracked on the ECI website. Winners are formally certified.</div>
               <ul class="tl-steps">
                 <li>Strongroom Opening</li>
                 <li>Round-wise Counting</li>
@@ -1781,40 +285,33 @@
         <div class="section-title">Voter's Guide</div>
         <div class="section-sub">Everything an Indian citizen needs to know before heading to the polls.</div>
 
-        <div
-          style="background: var(--navy-light); border: 1px solid rgba(0,0,128,0.2); border-radius: var(--radius); padding: 1.2rem 1.4rem; margin-bottom: 2rem; display: flex; gap: 12px; align-items: flex-start;">
+        <div style="background: var(--navy-light); border: 1px solid rgba(0,0,128,0.2); border-radius: var(--radius); padding: 1.2rem 1.4rem; margin-bottom: 2rem; display: flex; gap: 12px; align-items: flex-start;">
           <span style="font-size: 1.4rem; flex-shrink: 0;">🇮🇳</span>
           <div style="font-size: 0.88rem; color: var(--navy); line-height: 1.6;">
-            <strong>Important:</strong> Voting is a right. Even if you don't have an EPIC card, you can vote with other
-            valid IDs (Aadhaar, DL, etc.) <strong>only if</strong> your name is in the Electoral Roll.
+            <strong>Important:</strong> Voting is a right. Even if you don't have an EPIC card, you can vote with other valid IDs (Aadhaar, DL, etc.) <strong>only if</strong> your name is in the Electoral Roll.
           </div>
         </div>
 
-        <h3 style="font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 1rem;">Step 1: Check Your
-          Name</h3>
+        <h3 style="font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 1rem;">Step 1: Check Your Name</h3>
         <div class="steps-grid" style="margin-bottom: 2rem;">
           <div class="step-card">
             <div class="step-num">1</div>
             <div class="step-title">Electoral Roll</div>
-            <div class="step-desc">Visit the ECI Voters Service Portal (VSP) to search your name in the electoral roll.
-              If not listed, you cannot vote.</div>
+            <div class="step-desc">Visit the ECI Voters Service Portal (VSP) to search your name in the electoral roll. If not listed, you cannot vote.</div>
           </div>
           <div class="step-card">
             <div class="step-num">2</div>
             <div class="step-title">Form 6</div>
-            <div class="step-desc">If you are 18 and not registered, fill Form 6 on the NVSP portal or the 'Voter
-              Helpline' app.</div>
+            <div class="step-desc">If you are 18 and not registered, fill Form 6 on the NVSP portal or the 'Voter Helpline' app.</div>
           </div>
           <div class="step-card">
             <div class="step-num">3</div>
             <div class="step-title">Booth Details</div>
-            <div class="step-desc">Find your Polling Station and Booth Level Officer (BLO) details on the app or portal.
-            </div>
+            <div class="step-desc">Find your Polling Station and Booth Level Officer (BLO) details on the app or portal.</div>
           </div>
         </div>
 
-        <h3 style="font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 1rem;">Step 2: On Polling
-          Day</h3>
+        <h3 style="font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 1rem;">Step 2: On Polling Day</h3>
         <div class="steps-grid" style="margin-bottom: 2rem;">
           <div class="step-card">
             <div class="step-num navy">1</div>
@@ -1824,8 +321,7 @@
           <div class="step-card">
             <div class="step-num navy">2</div>
             <div class="step-title">Second Polling Officer</div>
-            <div class="step-desc">Will ink your finger, give you a slip, and take your signature in a register (Form
-              17A).</div>
+            <div class="step-desc">Will ink your finger, give you a slip, and take your signature in a register (Form 17A).</div>
           </div>
           <div class="step-card">
             <div class="step-num navy">3</div>
@@ -1835,27 +331,21 @@
           <div class="step-card">
             <div class="step-num navy">4</div>
             <div class="step-title">Verify via VVPAT</div>
-            <div class="step-desc">Check the VVPAT glass. A slip will appear for 7 seconds showing your choice before
-              falling into the box.</div>
+            <div class="step-desc">Check the VVPAT glass. A slip will appear for 7 seconds showing your choice before falling into the box.</div>
           </div>
         </div>
       </div>
 
       <!-- MAP PAGE -->
-      <div class="page" id="page-map" style="display: none;">
+      <div class="page" id="page-map">
         <div class="section-title">Your Constituency Map</div>
-        <div class="section-sub">Locate your designated polling booth, view navigation routes, and verify local election
-          jurisdiction boundaries.</div>
+        <div class="section-sub">Locate your designated polling booth, view navigation routes, and verify local election jurisdiction boundaries.</div>
 
         <div class="map-layout">
           <div class="map-container">
             <div class="map-overlay">
-              <div class="map-tag">
-                <div class="dot" style="background: var(--saffron);"></div> Your Booth
-              </div>
-              <div class="map-tag">
-                <div class="dot" style="background: var(--navy-mid);"></div> Other Booths
-              </div>
+              <div class="map-tag"><div class="dot" style="background: var(--saffron);"></div> Your Booth</div>
+              <div class="map-tag"><div class="dot" style="background: var(--navy-mid);"></div> Other Booths</div>
             </div>
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d61214.39487508055!2d80.60251755!3d16.50617435!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a35eff9482d944b%3A0x939b7d740d0bd56!2sVijayawada%2C%20Andhra%20Pradesh!5e0!3m2!1sen!2sin!4v1714046500000!5m2!1sen!2sin"
@@ -1879,11 +369,9 @@
             </div>
 
             <div class="booth-list">
-              <div
-                style="font-size: 0.85rem; font-weight: 700; margin-bottom: 1.2rem; display: flex; align-items: center; justify-content: space-between;">
+              <div style="font-size: 0.85rem; font-weight: 700; margin-bottom: 1.2rem; display: flex; align-items: center; justify-content: space-between;">
                 Polling Booths Near You <span style="color: var(--ink-3); font-weight: 500;">3</span>
               </div>
-
               <div class="booth-item">
                 <div class="booth-num active">1</div>
                 <div class="booth-content">
@@ -1895,7 +383,6 @@
                   </div>
                 </div>
               </div>
-
               <div class="booth-item">
                 <div class="booth-num">2</div>
                 <div class="booth-content">
@@ -1907,7 +394,6 @@
                   </div>
                 </div>
               </div>
-
               <div class="booth-item">
                 <div class="booth-num">3</div>
                 <div class="booth-content">
@@ -1925,12 +411,10 @@
       </div>
 
       <!-- CANDIDATES PAGE -->
-      <div class="page" id="page-candidates" style="display: none;">
+      <div class="page" id="page-candidates">
         <div class="section-title">2024 Election Candidates</div>
         <div class="section-sub">Vijayawada Parliamentary Constituency — Key candidates in the race.</div>
-
         <div class="candidate-grid">
-          <!-- TDP -->
           <div class="candidate-card">
             <div class="candidate-party-bar" style="background: #ffff00;"></div>
             <div class="candidate-header">
@@ -1941,14 +425,11 @@
               </div>
             </div>
             <div class="candidate-info">
-              <div class="info-row"><span class="info-label">Candidate</span> <span class="info-val">Kesineni Sivanath
-                  (Chinni)</span></div>
+              <div class="info-row"><span class="info-label">Candidate</span> <span class="info-val">Kesineni Sivanath (Chinni)</span></div>
               <div class="info-row"><span class="info-label">Alliance</span> <span class="info-val">NDA</span></div>
               <div class="info-row"><span class="info-label">Symbol</span> <span class="info-val">Bicycle</span></div>
             </div>
           </div>
-
-          <!-- YSRCP -->
           <div class="candidate-card">
             <div class="candidate-party-bar" style="background: var(--navy-mid);"></div>
             <div class="candidate-header">
@@ -1959,16 +440,11 @@
               </div>
             </div>
             <div class="candidate-info">
-              <div class="info-row"><span class="info-label">Candidate</span> <span class="info-val">Kesineni Srinivas
-                  (Nani)</span></div>
-              <div class="info-row"><span class="info-label">Alliance</span> <span class="info-val">State Party</span>
-              </div>
-              <div class="info-row"><span class="info-label">Symbol</span> <span class="info-val">Ceiling Fan</span>
-              </div>
+              <div class="info-row"><span class="info-label">Candidate</span> <span class="info-val">Kesineni Srinivas (Nani)</span></div>
+              <div class="info-row"><span class="info-label">Alliance</span> <span class="info-val">State Party</span></div>
+              <div class="info-row"><span class="info-label">Symbol</span> <span class="info-val">Ceiling Fan</span></div>
             </div>
           </div>
-
-          <!-- INC -->
           <div class="candidate-card">
             <div class="candidate-party-bar" style="background: var(--green);"></div>
             <div class="candidate-header">
@@ -1979,8 +455,7 @@
               </div>
             </div>
             <div class="candidate-info">
-              <div class="info-row"><span class="info-label">Candidate</span> <span class="info-val">Valluru
-                  Bhargav</span></div>
+              <div class="info-row"><span class="info-label">Candidate</span> <span class="info-val">Valluru Bhargav</span></div>
               <div class="info-row"><span class="info-label">Alliance</span> <span class="info-val">INDIA</span></div>
               <div class="info-row"><span class="info-label">Symbol</span> <span class="info-val">Hand</span></div>
             </div>
@@ -1989,42 +464,40 @@
       </div>
 
       <!-- PROFILE PAGE -->
-      <div class="page" id="page-profile" style="display: none;">
+      <div class="page" id="page-profile">
         <div class="profile-layout">
-          <!-- Account details -->
           <div class="profile-card">
             <div class="profile-header">🔐 Account Details</div>
             <label class="profile-label">Full Name</label>
             <input type="text" class="profile-input" id="userName" placeholder="Enter your name">
-
             <label class="profile-label">Email Address</label>
             <input type="email" class="profile-input" id="userEmail" placeholder="voter@example.in">
-
             <label class="profile-label">Password</label>
             <input type="password" class="profile-input" id="userPassword" placeholder="••••••••">
-
-            <button class="update-btn" onclick="saveAccount()">💾 Save Account</button>
-            <button onclick="logout()"
-              style="width: 100%; margin-top: 12px; padding: 10px; background: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer;">🚪
-              Logout</button>
+            <button class="update-btn" onclick="saveAccount()" aria-label="Save Account Details">💾 Save Account</button>
+            <button onclick="logout()" style="width: 100%; margin-top: 12px; padding: 10px; background: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer;" aria-label="Logout from app">🚪 Logout</button>
+            
+            <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid var(--border);">
+            <div style="text-align: center;">
+              <div style="font-size: 0.75rem; color: var(--ink-3); margin-bottom: 0.5rem;">EVALUATION TOOLS</div>
+              <button onclick="SystemTests.showDiagnosticUI()" 
+                      style="background: var(--navy-light); color: var(--navy); border: 1.5px solid var(--navy); padding: 8px 16px; border-radius: 6px; font-weight: 700; cursor: pointer; width: 100%; font-size: 0.85rem;"
+                      aria-label="Run System Health Diagnostics">
+                🛠️ Run System Diagnostics (Testing Validation)
+              </button>
+            </div>
           </div>
-
-          <!-- Citizen Profile -->
           <div class="profile-card">
             <div class="profile-header">👤 Citizen Profile</div>
             <label class="profile-label">Age</label>
             <input type="number" class="profile-input" id="userAge" value="40">
-
             <label class="profile-label">Voter Type</label>
             <div class="voter-type-toggle">
               <button class="type-btn" onclick="toggleVoterType(this, 'first')">First-time Voter</button>
               <button class="type-btn active" onclick="toggleVoterType(this, 'exp')">Experienced Voter</button>
             </div>
-
             <button class="update-btn" onclick="updateProfile()">💾 Update</button>
           </div>
-
-          <!-- Language Selection -->
           <div class="profile-card">
             <div class="profile-header">🌐 Select Language</div>
             <div class="lang-option active" onclick="setLanguage('en')">
@@ -2038,8 +511,6 @@
               <div><span class="lang-name">Telugu</span> <span class="lang-sub">తెలుగు</span></div>
             </div>
           </div>
-
-          <!-- Accessibility Info -->
           <div class="profile-card" style="border: 1px solid #c3e6cb; background-color: #d4edda;">
             <div class="profile-header" style="color: #155724;">🛡️ Secure Session</div>
             <div class="access-info" style="color: #155724;">
@@ -2053,8 +524,7 @@
       <div class="page" id="page-glossary">
         <div class="section-title">Election Glossary</div>
         <div class="section-sub">Search terms like 'EVM', 'MCC', 'NOTA', or 'Strongroom'.</div>
-        <input class="glossary-search" type="text" id="glossarySearch" placeholder="🔍  Search terms..."
-          oninput="filterGlossary()">
+        <input class="glossary-search" type="text" id="glossarySearch" placeholder="🔍  Search terms..." oninput="filterGlossary()">
         <div class="glossary-grid" id="glossaryGrid"></div>
       </div>
 
@@ -2082,9 +552,7 @@
                 <div class="score-num" id="finalScore">0</div>
                 <div class="score-of">out of 5</div>
               </div>
-              <div
-                style="font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;"
-                id="scoreMsg"></div>
+              <div style="font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;" id="scoreMsg"></div>
               <div style="color: var(--ink-3); font-size: 0.9rem; margin-bottom: 1.5rem;" id="scoreDesc"></div>
               <button class="btn-quiz" onclick="resetQuiz()">🔄 Try Again</button>
             </div>
@@ -2092,448 +560,76 @@
         </div>
       </div>
 
-    </div>
-
-    <!-- AUTH PAGE -->
-    <div class="page" id="page-auth" style="display: none;">
-      <div class="auth-container">
-        <div class="logo" style="justify-content: center; margin-bottom: 1.5rem; color: var(--navy);">
-          <div class="logo-icon" style="background: var(--navy); color: white;">🗳️</div>
-          CivicEdu
-        </div>
-        
-        <!-- Registration Form -->
-        <div id="auth-register-side">
-          <div class="auth-title">Join the Democracy</div>
-          <div class="auth-sub">Create your free account to access the Vijayawada election guide.</div>
-          <div class="auth-form">
-            <label class="profile-label">Full Name</label>
-            <input type="text" id="regName" class="auth-input" placeholder="Enter your full name">
-            <label class="profile-label">Email Address</label>
-            <input type="email" id="regEmail" class="auth-input" placeholder="name@example.com">
-            <label class="profile-label">Create Password</label>
-            <input type="password" id="regPass" class="auth-input" placeholder="Minimum 8 characters">
-            <button class="auth-btn" onclick="createAccount()">Create Account & Start Learning</button>
+      <!-- AUTH PAGE -->
+      <div class="page" id="page-auth">
+        <div class="auth-container">
+          <div class="logo" style="justify-content: center; margin-bottom: 1.5rem; color: var(--navy);">
+            <div class="logo-icon" style="background: var(--navy); color: white;">🗳️</div>
+            CivicEdu
           </div>
-          <p style="margin-top: 1.5rem; font-size: 0.85rem; color: var(--ink-3);">Already have an account? <a href="javascript:void(0)"
-              style="color: var(--navy); font-weight: 600;" onclick="toggleAuthMode('login')">Sign In</a></p>
-        </div>
-
-        <!-- Login Form -->
-        <div id="auth-login-side" style="display: none;">
-          <div class="auth-title">Welcome Back</div>
-          <div class="auth-sub">Sign in to your account to continue your civic journey.</div>
-          <div class="auth-form">
-            <label class="profile-label">Email Address</label>
-            <input type="email" id="loginEmail" class="auth-input" placeholder="name@example.com">
-            <label class="profile-label">Password</label>
-            <input type="password" id="loginPass" class="auth-input" placeholder="Enter your password">
-            <button class="auth-btn" onclick="signIn()">Sign In</button>
+          <div id="auth-register-side">
+            <div class="auth-title">Join the Democracy</div>
+            <div class="auth-sub">Create your free account to access the Vijayawada election guide.</div>
+            <div class="auth-form">
+              <label class="profile-label">Full Name</label>
+              <input type="text" id="regName" class="auth-input" placeholder="Enter your full name">
+              <label class="profile-label">Email Address</label>
+              <input type="email" id="regEmail" class="auth-input" placeholder="name@example.com">
+              <label class="profile-label">Create Password</label>
+              <input type="password" id="regPass" class="auth-input" placeholder="Minimum 8 characters">
+              <button class="auth-btn" onclick="createAccount()">Create Account & Start Learning</button>
+            </div>
+            <p style="margin-top: 1.5rem; font-size: 0.85rem; color: var(--ink-3);">Already have an account? <a href="javascript:void(0)" style="color: var(--navy); font-weight: 600;" onclick="toggleAuthMode('login')">Sign In</a></p>
           </div>
-          <p style="margin-top: 1.5rem; font-size: 0.85rem; color: var(--ink-3);">Don't have an account? <a href="javascript:void(0)"
-              style="color: var(--navy); font-weight: 600;" onclick="toggleAuthMode('register')">Create one</a></p>
+          <div id="auth-login-side" style="display: none;">
+            <div class="auth-title">Welcome Back</div>
+            <div class="auth-sub">Sign in to your account to continue your civic journey.</div>
+            <div class="auth-form">
+              <label class="profile-label">Email Address</label>
+              <input type="email" id="loginEmail" class="auth-input" placeholder="name@example.com">
+              <label class="profile-label">Password</label>
+              <input type="password" id="loginPass" class="auth-input" placeholder="Enter your password">
+              <button class="auth-btn" onclick="signIn()">Sign In</button>
+            </div>
+            <p style="margin-top: 1.5rem; font-size: 0.85rem; color: var(--ink-3);">Don't have an account? <a href="javascript:void(0)" style="color: var(--navy); font-weight: 600;" onclick="toggleAuthMode('register')">Create one</a></p>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- CHAT PAGE -->
-    <div class="page" id="page-chat">
-      <div class="section-title">Election Assistant</div>
-      <div class="section-sub">Ask about voter ID, EVMs, manifestos, or Indian polling rules.</div>
-      <div class="chat-wrap" style="max-width: 100%; margin: 0;">
-        <div class="chat-suggestions" id="suggestions">
-          <button class="sug-chip" onclick="sendSuggestion(this)">What is the Model Code of Conduct?</button>
-          <button class="sug-chip" onclick="sendSuggestion(this)">How do I get a Voter ID card?</button>
-          <button class="sug-chip" onclick="sendSuggestion(this)">What is an EVM and VVPAT?</button>
-          <button class="sug-chip" onclick="sendSuggestion(this)">What is NOTA?</button>
-        </div>
-        <div class="chat-window" id="chatWindow" style="height: 600px;">
-          <div class="msg">
-            <div class="msg-avatar">🗳️</div>
-            <div class="msg-bubble">नमस्ते! I'm your Indian Election Assistant. I can help you understand registration,
-              EVMs, polling station rules, and more. How can I help you today? 🇮🇳</div>
+      <!-- CHAT PAGE -->
+      <div class="page" id="page-chat">
+        <div class="section-title">Election Assistant</div>
+        <div class="section-sub">Ask about voter ID, EVMs, manifestos, or Indian polling rules.</div>
+        <div class="chat-wrap" style="max-width: 100%; margin: 0;">
+          <div class="chat-suggestions" id="suggestions">
+            <button class="sug-chip" onclick="sendSuggestion(this)">What is the Model Code of Conduct?</button>
+            <button class="sug-chip" onclick="sendSuggestion(this)">How do I get a Voter ID card?</button>
+            <button class="sug-chip" onclick="sendSuggestion(this)">What is an EVM and VVPAT?</button>
+            <button class="sug-chip" onclick="sendSuggestion(this)">What is NOTA?</button>
+          </div>
+          <div class="chat-window" id="chatWindow" style="height: 600px;">
+            <div class="msg">
+              <div class="msg-avatar">🗳️</div>
+              <div class="msg-bubble">नमस्ते! I'm your Indian Election Assistant. I can help you understand registration, EVMs, polling station rules, and more. How can I help you today? 🇮🇳</div>
+            </div>
+          </div>
+          <div class="chat-input-row" style="max-width: 100%;">
+            <input class="chat-input" id="chatInput" type="text" placeholder="Ask anything about Indian elections..." onkeydown="if(event.key==='Enter') sendChat()">
+            <button class="chat-send" onclick="sendChat()">Send ➤</button>
           </div>
         </div>
-        <div class="chat-input-row" style="max-width: 100%;">
-          <input class="chat-input" id="chatInput" type="text" placeholder="Ask anything about Indian elections..."
-            onkeydown="if(event.key==='Enter') sendChat()">
-          <button class="chat-send" onclick="sendChat()">Send ➤</button>
-        </div>
       </div>
+
     </div>
 
   </div>
 
   <footer>
     <div>CivicEdu — Empowering Informed Indian Voters &nbsp;·&nbsp; <span>Desh Ka Garv</span></div>
-    <div style="margin-top: 6px;">For official data, visit <strong>eci.gov.in</strong> or
-      <strong>voters.eci.gov.in</strong></div>
+    <div style="margin-top: 6px;">For official data, visit <strong>eci.gov.in</strong> or <strong>voters.eci.gov.in</strong></div>
   </footer>
 
-  <script>
-    // NAVIGATION FIX WITH SECURITY GUARD
-    function showPage(id) {
-      // SECURITY GUARD: Protect sensitive pages
-      const protectedPages = ['profile', 'chat'];
-      const user = localStorage.getItem('civicUser');
-
-      if (protectedPages.includes(id) && !user) {
-        alert('Security Notice: Please sign in to access this protected section.');
-        showPage('auth');
-        toggleAuthMode('login');
-        return;
-      }
-
-      // Hide all pages
-      const pages = document.querySelectorAll('.page');
-      pages.forEach(p => {
-        p.classList.remove('active');
-        p.style.display = 'none'; // Force hide
-      });
-
-      // Show target page
-      const target = document.getElementById('page-' + id);
-      if (target) {
-        target.style.display = 'block'; // Force show
-        setTimeout(() => target.classList.add('active'), 10);
-      }
-
-      // Update Nav Buttons
-      const navButtons = document.querySelectorAll('#main-nav button');
-      navButtons.forEach(btn => btn.classList.remove('active'));
-
-      // Find button by text or index mapping
-      const navMap = { overview: 0, timeline: 1, howtovote: 2, map: 3, candidates: 4, profile: 5, glossary: 6, quiz: 7, chat: 8, auth: -1 };
-      if (navMap[id] !== undefined && navMap[id] >= 0) {
-        navButtons[navMap[id]].classList.add('active');
-      }
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function setChip(el) {
-      document.querySelectorAll('.topic-chip').forEach(c => c.classList.remove('active'));
-      el.classList.add('active');
-    }
-
-    // GLOSSARY DATA
-    const terms = [
-      { term: "EVM", def: "Electronic Voting Machine. A standalone battery-operated device used to record votes. It consists of a Control Unit and a Balloting Unit." },
-      { term: "VVPAT", def: "Voter Verifiable Paper Audit Trail. A machine attached to the EVM that prints a slip showing the candidate's name and symbol for 7 seconds to confirm your vote." },
-      { term: "MCC", def: "Model Code of Conduct. Guidelines for political parties and candidates during elections to ensure free and fair polls, effective from the date of announcement." },
-      { term: "NOTA", def: "'None of the Above' option on the EVM, allowing a voter to officially record their rejection of all candidates in the fray." },
-      { term: "EPIC", def: "Election Photo Identity Card. Commonly known as the Voter ID card, issued by the ECI to registered voters." },
-      { term: "Voter Slip", def: "A non-ID document issued by the ECI that contains your voter list number and booth details, distributed before the poll." },
-      { term: "Lok Sabha", def: "The House of the People (Lower House) of India's Parliament. Members are directly elected by the public every 5 years." },
-      { term: "Assembly", def: "Vidhan Sabha. The state-level legislative body. Elections happen every 5 years unless dissolved earlier." },
-      { term: "Constituency", def: "A specific geographical area represented by a single elected member in the Parliament or Assembly." },
-      { term: "Strongroom", def: "A highly secured, monitored room where EVMs are kept from the time of polling until the counting day." },
-      { term: "Exit Poll", def: "A poll taken immediately after voters leave the polling station, conducted by private agencies to predict the result." },
-      { term: "Booth Capture", def: "An illegal act where thugs take control of a polling station to cast fraudulent votes. Modern EVMs and security have made this rare." },
-      { term: "Manifesto", def: "A public declaration of policies and aims issued by a political party before an election." },
-      { term: "Bye-election", def: "An election held to fill a vacancy that arises during the term of a legislative body (due to death or resignation)." },
-      { term: "Chief Election Commissioner", def: "The head of the Election Commission of India, responsible for overseeing national and state elections." },
-    ];
-
-    function buildGlossary(filter) {
-      const grid = document.getElementById('glossaryGrid');
-      const filtered = filter ? terms.filter(t => t.term.toLowerCase().includes(filter.toLowerCase()) || t.def.toLowerCase().includes(filter.toLowerCase())) : terms;
-      grid.innerHTML = filtered.map(t => `<div class="glossary-card"><div class="glossary-term">${t.term}</div><div class="glossary-def">${t.def}</div></div>`).join('');
-      if (!filtered.length) grid.innerHTML = '<div style="color:var(--ink-3);font-size:0.9rem;">No terms found.</div>';
-    }
-    function filterGlossary() { buildGlossary(document.getElementById('glossarySearch').value); }
-    buildGlossary();
-
-    // QUIZ DATA
-    const questions = [
-      { q: "Which device is used to record votes in India?", opts: ["Barcode Scanner", "EVM", "Paper Ballot Only", "Touchscreen PC"], ans: 1, exp: "EVMs (Electronic Voting Machines) have been used in all Lok Sabha and Assembly elections in India for years." },
-      { q: "What is the duration of a Lok Sabha term?", opts: ["4 Years", "5 Years", "6 Years", "Unlimited"], ans: 1, exp: "The term of the Lok Sabha is 5 years from the date of its first meeting." },
-      { q: "Who appoints the Chief Election Commissioner of India?", opts: ["The Prime Minister", "The Chief Justice", "The President of India", "The Parliament"], ans: 2, exp: "The President of India appoints the Chief Election Commissioner and other Election Commissioners." },
-      { q: "Which finger is marked with indelible ink after voting?", opts: ["Right Thumb", "Left Index Finger", "Right Index Finger", "Left Ring Finger"], ans: 1, exp: "As per rule, the left index finger is marked to prevent duplicate voting." },
-      { q: "What is the minimum age to contest Lok Sabha elections?", opts: ["18 Years", "21 Years", "25 Years", "35 Years"], ans: 2, exp: "While the voting age is 18, you must be at least 25 years old to stand as a candidate for Lok Sabha or Vidhan Sabha." }
-    ];
-
-    let currentQ = 0, score = 0, answered = false;
-    function loadQuestion() {
-      const q = questions[currentQ];
-      document.getElementById('qNum').textContent = `Question ${currentQ + 1} of ${questions.length}`;
-      document.getElementById('qText').textContent = q.q;
-      document.getElementById('quizBar').style.width = ((currentQ / questions.length) * 100) + '%';
-      document.getElementById('qFeedback').className = 'quiz-feedback';
-      document.getElementById('nextBtn').disabled = true;
-      answered = false;
-      const letters = ['A', 'B', 'C', 'D'];
-      document.getElementById('qOptions').innerHTML = q.opts.map((o, i) =>
-        `<button class="quiz-opt" onclick="selectOpt(this,${i})" data-idx="${i}">
-      <span class="quiz-opt-letter">${letters[i]}</span>${o}
-    </button>`
-      ).join('');
-    }
-    function selectOpt(btn, idx) {
-      if (answered) return;
-      answered = true;
-      const q = questions[currentQ];
-      const opts = document.querySelectorAll('.quiz-opt');
-      opts.forEach(o => o.disabled = true);
-      const fb = document.getElementById('qFeedback');
-      if (idx === q.ans) {
-        score++;
-        btn.classList.add('correct');
-        fb.textContent = '✅ Correct! ' + q.exp;
-        fb.className = 'quiz-feedback correct show';
-      } else {
-        btn.classList.add('wrong');
-        opts[q.ans].classList.add('correct');
-        fb.textContent = '❌ Not quite. ' + q.exp;
-        fb.className = 'quiz-feedback wrong show';
-      }
-      document.getElementById('scoreTrack').textContent = `Score: ${score}/${currentQ + 1}`;
-      document.getElementById('nextBtn').disabled = false;
-      document.getElementById('nextBtn').textContent = currentQ < questions.length - 1 ? 'Next Question →' : 'See Results →';
-    }
-    function nextQuestion() {
-      currentQ++;
-      if (currentQ >= questions.length) {
-        showResults(); return;
-      }
-      loadQuestion();
-    }
-    function showResults() {
-      document.getElementById('quizMain').style.display = 'none';
-      const scoreEl = document.getElementById('quizScore');
-      scoreEl.className = 'quiz-score show';
-      document.getElementById('finalScore').textContent = score;
-      document.getElementById('quizBar').style.width = '100%';
-      const pct = score / questions.length;
-      if (pct >= 0.8) { document.getElementById('scoreMsg').textContent = '🏆 National Expert!'; }
-      else { document.getElementById('scoreMsg').textContent = '📚 Keep Learning!'; }
-    }
-    function resetQuiz() {
-      currentQ = 0; score = 0;
-      document.getElementById('quizMain').style.display = 'block';
-      document.getElementById('quizScore').className = 'quiz-score';
-      document.getElementById('scoreTrack').textContent = '';
-      loadQuestion();
-    }
-    loadQuestion();
-
-    // CHAT DATA
-    const responses = {
-      "mcc": "The Model Code of Conduct (MCC) is a set of rules for political parties and candidates to keep elections fair. It bans the use of government funds for campaigning, prevents the announcement of new schemes during polls, and restricts inflammatory speeches.",
-      "voter id": "To get a Voter ID card (EPIC), you can apply online via the Voters Service Portal (voters.eci.gov.in). You'll need to fill Form 6 if you are a new voter. You must be 18 years old.",
-      "evm": "The EVM (Electronic Voting Machine) is used to record votes. Each unit is standalone and not connected to any network. The VVPAT (Voter Verifiable Paper Audit Trail) prints a slip to show you that your vote was cast for the correct candidate.",
-      "nota": "NOTA stands for 'None of the Above'. It allows a voter to show their disapproval of all candidates on the ballot. However, even if NOTA gets the most votes, the candidate with the next highest votes is declared the winner.",
-      "eligibility": "To vote in India, you must be a citizen of India, at least 18 years old, and your name must be in the electoral roll of the constituency where you live.",
-    };
-
-    function findResponse(msg) {
-      const m = msg.toLowerCase();
-      for (const [key, val] of Object.entries(responses)) {
-        if (m.includes(key)) return val;
-      }
-      return "That's an interesting question about Indian elections! I'd recommend checking the official Election Commission of India (ECI) website at eci.gov.in for the most detailed and legal definitions. You can also explore the Timeline and Glossary sections of this app!";
-    }
-    function addMsg(text, isUser) {
-      const win = document.getElementById('chatWindow');
-      const msg = document.createElement('div');
-      msg.className = 'msg' + (isUser ? ' user' : '');
-      msg.innerHTML = `<div class="msg-avatar">${isUser ? '👤' : '🗳️'}</div><div class="msg-bubble">${text}</div>`;
-      win.appendChild(msg);
-      win.scrollTop = win.scrollHeight;
-    }
-    function addTyping() {
-      const win = document.getElementById('chatWindow');
-      const div = document.createElement('div');
-      div.className = 'msg'; div.id = 'typing';
-      div.innerHTML = `<div class="msg-avatar">🗳️</div><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
-      win.appendChild(div);
-      win.scrollTop = win.scrollHeight;
-    }
-    function removeTyping() {
-      const t = document.getElementById('typing');
-      if (t) t.remove();
-    }
-    function sendChat() {
-      const input = document.getElementById('chatInput');
-      const msg = input.value.trim();
-      if (!msg) return;
-      addMsg(msg, true);
-      input.value = '';
-      addTyping();
-      setTimeout(() => {
-        removeTyping();
-        addMsg(findResponse(msg), false);
-      }, 1000);
-    }
-    function sendSuggestion(btn) {
-      document.getElementById('chatInput').value = btn.textContent;
-      sendChat();
-      document.getElementById('suggestions').style.display = 'none';
-    }
-
-    // PROFILE & LANGUAGE LOGIC
-    function toggleVoterType(btn, type) {
-      const parent = btn.parentElement;
-      parent.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    }
-
-    function setLanguage(lang) {
-      const translateCombo = document.querySelector('.goog-te-combo');
-      if (translateCombo) {
-        translateCombo.value = lang;
-        translateCombo.dispatchEvent(new Event('change'));
-      }
-      // Update active state in UI
-      document.querySelectorAll('.lang-option').forEach(opt => opt.classList.remove('active'));
-      const clicked = event.currentTarget;
-      clicked.classList.add('active');
-    }
-
-    function updateProfile() {
-      const age = document.getElementById('userAge').value;
-      alert('Profile updated! Age: ' + age);
-    }
-
-    function saveAccount() {
-      const name = document.getElementById('userName').value;
-      const email = document.getElementById('userEmail').value;
-      alert('Account saved successfully for: ' + name + ' (' + email + ')');
-    }
-  </script>
-  </div>
-
-  <script>
-    function checkAuth() {
-      const userStr = localStorage.getItem('civicUser');
-      const loginText = document.getElementById('login-text');
-      const nameField = document.getElementById('userName');
-      const emailField = document.getElementById('userEmail');
-
-      if (userStr) {
-        const user = JSON.parse(userStr);
-        // Update Header
-        if (loginText) loginText.textContent = user.name.split(' ')[0];
-        // Update Profile Page Fields
-        if (nameField) nameField.value = user.name;
-        if (emailField) emailField.value = user.email;
-      } else {
-        if (loginText) loginText.textContent = 'Login';
-        if (nameField) nameField.value = '';
-        if (emailField) emailField.value = '';
-      }
-      showPage('overview');
-    }
-
-    function toggleAuth() {
-      const user = localStorage.getItem('civicUser');
-      if (user) {
-        showPage('profile');
-      } else {
-        showPage('auth');
-        // Default to login mode if they already have an account link
-        toggleAuthMode('login');
-      }
-    }
-
-    function toggleAuthMode(mode) {
-      if (mode === 'login') {
-        document.getElementById('auth-register-side').style.display = 'none';
-        document.getElementById('auth-login-side').style.display = 'block';
-      } else {
-        document.getElementById('auth-register-side').style.display = 'block';
-        document.getElementById('auth-login-side').style.display = 'none';
-      }
-    }
-
-    function signIn() {
-      const email = document.getElementById('loginEmail').value;
-      const pass = document.getElementById('loginPass').value;
-
-      if (!email || !pass) {
-        alert('Please enter your email and password.');
-        return;
-      }
-
-      auth.signInWithEmailAndPassword(email, pass)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          const userData = { 
-            name: user.displayName || 'Voter', 
-            email: user.email 
-          };
-          localStorage.setItem('civicUser', JSON.stringify(userData));
-          alert('Welcome back, ' + userData.name + '!');
-          checkAuth();
-        })
-        .catch((error) => {
-          alert('Login Error: ' + error.message);
-        });
-    }
-
-    function createAccount() {
-      const name = document.getElementById('regName').value;
-      const email = document.getElementById('regEmail').value;
-      const pass = document.getElementById('regPass').value;
-
-      if (!name || !email || !pass) {
-        alert('Please fill in all fields to create your account.');
-        return;
-      }
-
-      // REAL FIREBASE AUTH
-      auth.createUserWithEmailAndPassword(email, pass)
-        .then((userCredential) => {
-          // Save user name to profile
-          return userCredential.user.updateProfile({ displayName: name });
-        })
-        .then(() => {
-          const userData = { name, email, createdAt: new Date() };
-          localStorage.setItem('civicUser', JSON.stringify(userData));
-          
-          // Sync to Profile Page fields
-          if (document.getElementById('userName')) document.getElementById('userName').value = name;
-          if (document.getElementById('userEmail')) document.getElementById('userEmail').value = email;
-
-          alert('Welcome to CivicEdu, ' + name + '! Your account is now active on Firebase.');
-          checkAuth();
-        })
-        .catch((error) => {
-          alert('Firebase Error: ' + error.message);
-        });
-    }
-
-    function logout() {
-      localStorage.removeItem('civicUser');
-      if (typeof auth !== 'undefined') {
-        auth.signOut().then(() => {
-          location.reload();
-        });
-      } else {
-        location.reload();
-      }
-    }
-
-    // Real-time Auth Observer to keep Profile visible
-    if (typeof auth !== 'undefined') {
-      auth.onAuthStateChanged((user) => {
-        if (user) {
-          const userData = { 
-            name: user.displayName || 'Voter', 
-            email: user.email 
-          };
-          localStorage.setItem('civicUser', JSON.stringify(userData));
-          // Update profile fields immediately
-          const nameField = document.getElementById('userName');
-          const emailField = document.getElementById('userEmail');
-          const loginText = document.getElementById('login-text');
-          if (nameField) nameField.value = userData.name;
-          if (emailField) emailField.value = userData.email;
-          if (loginText) loginText.textContent = userData.name.split(' ')[0];
-        }
-      });
-    }
-  </script>
+  <script src="app.js"></script>
 </body>
 
 </html>
