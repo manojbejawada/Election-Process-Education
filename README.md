@@ -8,7 +8,7 @@ A comprehensive, interactive web application that educates Indian voters about t
 
 - **Election Timeline** — Full Lok Sabha election lifecycle
 - **Voter's Guide** — Step-by-step polling day instructions
-- **Constituency Map** — Google Maps integration with booth locations
+- **Constituency Map**— Google Maps integration with booth locations
 - **Candidates** — Vijayawada 2024 candidate profiles
 - **Election Glossary** — 15+ key terms with search
 - **Civics Quiz** — 5-question interactive knowledge test
