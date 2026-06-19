@@ -2,7 +2,7 @@
 
 A comprehensive, interactive web application that educates Indian voters about the election process, built with Google Services and web best practices.
 
----
+--
 
 ## 🗳️ Features
 
